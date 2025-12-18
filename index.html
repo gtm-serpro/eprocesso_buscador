@@ -18,7 +18,7 @@
                 <div class="search-input-container">
                     <input type="text" class="search-input" id="q" name="q" 
                            placeholder="Digite sua busca..." autocomplete="off">
-                    <button type="button" class="clear-input-btn" 
+                    <button type="button" class="clear-input-btn" id="clearBtn"
                             onclick="clearMainSearch()" title="Limpar busca">×</button>
                 </div>
                 <button type="submit" class="btn btn-primary" onclick="checkQueryEmpty()">Buscar</button>
@@ -42,21 +42,7 @@
         <aside>
             <div class="faceted-search">
                 <div class="faceted-title">Busca Facetada</div>
-                <div class="facet-group">
-                    <div class="facet-label">Grupo</div>
-                    <div class="facet-item">
-                        <a href="#" class="facet-link">Nome do Processo</a>
-                        <span class="facet-badge">123</span>
-                    </div>
-                    <div class="facet-item">
-                        <a href="#" class="facet-link">Tipo de Documento</a>
-                        <span class="facet-badge">45</span>
-                    </div>
-                    <div class="facet-item">
-                        <a href="#" class="facet-link">Unidade</a>
-                        <span class="facet-badge">78</span>
-                    </div>
-                </div>
+                <!-- Facetas serão inseridos aqui dinamicamente ou via server-side -->
             </div>
         </aside>
 
@@ -75,7 +61,6 @@
             <div class="results-container" id="resultsContainer">
                 <div class="loading-state">
                     <div class="spinner"></div>
-                    <p>Carregando resultados...</p>
                 </div>
                 <!-- Cards serão inseridos aqui dinamicamente ou via server-side -->
             </div>
@@ -461,9 +446,8 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
     <script src="app.js"></script>
-    <script src="card_manager.js"></script>
     <script src="busca_facetada.js"></script>
-    <script src="mock.js"></script>
+    <script src="card_manager.js"></script>
 </body>
 </html>
 

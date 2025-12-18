@@ -510,6 +510,21 @@ const Search = {
     }
 };
 
+const input = document.getElementById('q');
+const clearBtn = document.getElementById('clearBtn');
+
+function toggleClearButton() {
+    clearBtn.classList.toggle('is-visible', input.value.trim() !== '');
+}
+
+input.addEventListener('input', toggleClearButton);
+
+clearBtn.addEventListener('click', () => {
+    input.value = '';
+    input.focus();
+    toggleClearButton();
+});
+
 // =============================================================================
 // RESULT CARDS - Interação com cards de resultado
 // =============================================================================

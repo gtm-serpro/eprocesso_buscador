@@ -1,0 +1,83 @@
+#**
+ *  Render a hit representing a Compra
+ *  assumed to have a field called "no_objeto_compra_ss"
+ *#
+
+
+#if($doc.getFieldValue('id'))
+   #set($id = "#field('id')")
+   ##set($id_disp = $id_disp.replace("/mnt/", ""))
+   #set($link =    'https://eprocesso.suiterfb.receita.fazenda/eprocesso/api/documentos/'+$id.trim()+'/obterbinario/download')
+   #set($linkOCR = 'https://eprocesso.suiterfb.receita.fazenda/eprocesso/api/documentos/'+$id.trim()+'/obterbinarioocr/download')
+#end
+
+
+<div class="result-title">
+
+## Icon
+  ## Small file type icons from http://www.splitbrain.org/projects/file_icons (public domain)
+  ##<img src="#{url_root}/img/filetypes/pdf.png" align="center">
+<b>
+#if($doc.getFieldValue('arquivo_indexado_s')=='S')
+    #if($doc.getFieldValue('indicador_pesquisavel_s')=='S')
+        ##<a href='$linkOCR' target='_blank'> <img src="/compras/img/pdf_ocr.png" align="top"> </a>
+		<a href='$linkOCR' target='_blank'> <img src="#{url_root}/img/filetypes/pdf.png" align="top"> </a>
+    #end
+    <b>
+    #if($doc.getFieldValue('id')) 
+        #if($doc.getFieldValue('titulo_s')) 
+            #set( $campo = $doc.getFieldValue('tipo_documento_s') + " - " + $doc.getFieldValue('titulo_s') )
+            $campo
+            <a href='$link' target='_blank'> <img src="#{url_root}/img/filetypes/pdf.png" align="top"> </a>
+        #else
+            $doc.getFieldValue('tipo_documento_s')
+            <a href='$link' target='_blank'> <img src="#{url_root}/img/filetypes/pdf.png" align="top"> </a>
+        #end
+    #else<i>Indefinido</i>
+    #end</b>
+    #else
+    <img src="#{url_root}/img/filetypes/pdf.png" align="top">
+    <b>
+    #if($doc.getFieldValue('id')) 
+        #if($doc.getFieldValue('titulo_s')) 
+            #set( $campo = $doc.getFieldValue('tipo_documento_s') + " - " + $doc.getFieldValue('titulo_s') )
+            $campo
+        #else
+            $doc.getFieldValue('tipo_documento_s')
+        #end
+    #else<i>Indefinido</i>
+    #end</b>
+#end
+</b>
+ ##if($doc.getFieldValue('attr_stream_size') && $number.integer($doc.getFieldValue('attr_stream_size').get(0))!=0) ($number.format('#,##0',$number.integer($doc.getFieldValue('attr_stream_size').get(0))) bytes)#end
+
+<span class="mlt" style="display:none;">  #if($params.getBool('mlt', false) == false)<a href="#lensNoQ&q=id:$docId&mlt=true">Mais consultas como esta   </a>#end</span> </div>
+##do we have a physical store for this product
+##set($store = $doc.getFieldValue('store'))
+##if($store)<div class="map"><img src="http://maps.google.com/maps/api/staticmap?&zoom=12&size=150x80&maptype=roadmap&markers=$doc.getFieldValue('store')&sensor=false" /><div><small><a target="_map" href="http://maps.google.com/?q=$store&amp;source=embed">Larger Map</a></small></div></div>#end
+
+## TESTE E-PROCESSO
+#if($doc.getFieldValue('processo_s'))<div><strong>Numero do processo:</strong> #field('processo_s')</div>#end
+#if($doc.getFieldValue('dt_anexacao_tdt'))<div><strong>Data anexa&ccedil;&atilde;o:</strong> $date.format('dd/MM/Y HH:mm',$doc.getFieldValue('dt_anexacao_tdt'))</div>#end
+#if($doc.getFieldValue('dt_protocolo_tdt'))<div><strong>Data protocolo:</strong> $date.format('dd/MM/Y HH:mm',$doc.getFieldValue('dt_protocolo_tdt'))</div>#end
+#if($doc.getFieldValue('dt_juntada_tdt'))<div><strong>Data juntada:</strong> $date.format('dd/MM/Y HH:mm',$doc.getFieldValue('dt_juntada_tdt'))</div>#end
+#if($doc.getFieldValue('unidade_origem_s'))<div><strong>Unidade origem:</strong> #field('unidade_origem_s')</div>#end
+#if($doc.getFieldValue('equipe_origem_s'))<div><strong>Equipe origem:</strong> #field('equipe_origem_s')</div>#end
+#if($doc.getFieldValue('tipo_documento_s'))<div><strong>Tipo documento:</strong> #field('tipo_documento_s')</div>#end
+#if($doc.getFieldValue('titulo_s'))<div><strong>T&iacute;tulo documento:</strong> #field('titulo_s')</div>#end	
+#if($doc.getFieldValue('grupo_processo_s'))<div><strong>Grupo processo:</strong> #field('grupo_processo_s')</div>#end
+#if($doc.getFieldValue('tipo_processo_s'))<div><strong>Tipo processo:</strong> #field('tipo_processo_s')</div>#end
+#if($doc.getFieldValue('subtipo_processo_s'))<div><strong>Subtipo processo:</strong> #field('subtipo_processo_s')</div>#end	
+#if($doc.getFieldValue('ni_contribuinte_l'))<div><strong>NI do Contribuinte:</strong> #field('ni_contribuinte_l')</div>#end
+#if($doc.getFieldValue('nome_contribuinte_s'))<div><strong>Nome do Contribuinte:</strong> #field('nome_contribuinte_s')</div>#end	
+#if($doc.getFieldValue('nome_equipe_atual_s'))<div><strong>Nome Equipe Atual:</strong> #field('nome_equipe_atual_s')</div>#end	
+#if($doc.getFieldValue('nome_unidade_atual_s'))<div><strong>Nome Unidade Atual:</strong> #field('nome_unidade_atual_s')</div>#end	
+#if($doc.getFieldValue('nome_usuario_juntada_doc_s'))<div><strong>Nome respons&aacute;vel:</strong> #field('nome_usuario_juntada_doc_s')</div>#end
+#if($doc.getFieldValue('cpf_responsavel_s'))<div><strong>CPF Responsável:</strong> #field('cpf_responsavel_s')</div>#end
+#if($doc.getFieldValue('nome_usuario_juntada_doc_s'))<div><strong>Nome usuário juntada:</strong> #field('nome_usuario_juntada_doc_s')</div>#end
+#if($doc.getFieldValue('tributo_act_s'))<div><strong>Tributo ACT:</strong> #field('tributo_act_s')</div>#end
+#if($doc.getFieldValue('assuntos_objetos_s'))<div><strong>Assuntos/Objetos:</strong> #field('assuntos_objetos_s')</div>#end
+#if($doc.getFieldValue('aleg_recurso_contrib_txt'))<div><strong>Alegações:</strong> #field('aleg_recurso_contrib_txt')</div>#end
+#if($doc.getFieldValue('numero_doc_princiapal_exp_s'))<div><strong>Nr documento principal:</strong> #field('numero_doc_princiapal_exp_s')</div>#end	
+##if($request.params.get("q"))<div><strong>Trecho:</strong> #field('conteudo_txt')</div>#else #end
+#parse('debug.vm')

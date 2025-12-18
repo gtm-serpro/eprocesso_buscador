@@ -1,0 +1,237 @@
+#**
+ *  Renders the main query form
+ *#
+
+<div class="query-box">
+  <form id="query-form" action="#{url_for_home}" method="GET">
+
+    <div class="inputs">
+      <span #annTitle("Palavras a buscar. O sistema trata automaticamente min&uacute;sculas, mai&uacute;sculas, acentos, plural, masculino, feminino e artigos como o, a, os, as, de, etc. Pode-se, ainda, excluir palavras dos resultados colocando-se um h&iacute;fen antes da palavra.")>
+        Busca:
+        <input type="text" id="q" name="q" value="$!esc.html($params.get('q'))"/>
+        <input type="submit" id="querySubmit" value="Buscar"/>
+      </span>
+#** 
+ *     <div class="query-boost">
+ *       <span #annTitle("Aumenta a relev&acirc;ncia dos resultados pelo valor total da compra homologada.")>
+ *         <input type="checkbox" name="bf" value="valor_total_homologado_td"
+ *           #if($request.params.get('bf') == 'valor_total_homologado_td')checked="true"#end
+ *         >
+ *           Relev&acirc;ncia por valor homologado
+ *         </input>
+ *       </span>
+ *     #parse("query_spatial.vm")
+ *     #parse("query_group.vm")
+ *     </div>
+ *#
+  </div>
+</br>  
+<h2 onclick="showHideElement(document.getElementById('filtros_busca'))" style="font-size:14px;cursor:pointer;">FILTROS DE BUSCA >></h2>
+<input type="text" name="status" id="status" value="$!esc.html($params.get('status'))" style="display:none;">
+<div id="filtros_busca" name="filtros_busca" style="font-size:12px;display:none;">
+	<table border="0" >
+		<tr style="vertical-align:top;">
+			<td>
+				<label><STRONG>Data do Protocolo:</STRONG></label></br>
+				<STRONG>DE:</STRONG>&nbsp;&nbsp;
+				<input type="text" id="dt_protocolo_tdt_from_dd" name="dt_protocolo_tdt_from_dd" size="2" maxlength="2" style="width:25px;"  value="$!esc.html($params.get('dt_protocolo_tdt_from_dd'))">/
+				<input type="text" id="dt_protocolo_tdt_from_mm" name="dt_protocolo_tdt_from_mm" size="2" maxlength="2" style="width:25px;"  value="$!esc.html($params.get('dt_protocolo_tdt_from_mm'))">/
+				<input type="text" id="dt_protocolo_tdt_from_yyyy" name="dt_protocolo_tdt_from_yyyy" size="4" maxlength="4" style="width:50px;"  value="$!esc.html($params.get('dt_protocolo_tdt_from_yyyy'))">
+				</br>
+				<STRONG>ATÉ:</STRONG>
+				<input type="text" id="dt_protocolo_tdt_to_dd" name="dt_protocolo_tdt_to_dd" size="2" maxlength="2" style="width:25px;" value="$!esc.html($params.get('dt_protocolo_tdt_to_dd'))">/
+				<input type="text" id="dt_protocolo_tdt_to_mm" name="dt_protocolo_tdt_to_mm" size="2" maxlength="2" style="width:25px;" value="$!esc.html($params.get('dt_protocolo_tdt_to_mm'))">/
+				<input type="text" id="dt_protocolo_tdt_to_yyyy" name="dt_protocolo_tdt_to_yyyy" size="4" maxlength="4" style="width:50px;" value="$!esc.html($params.get('dt_protocolo_tdt_to_yyyy'))">
+				<button onclick="filterContentDate('dt_protocolo_tdt');">ok</button>
+				</br>
+				<label>Padrão: DD/MM/YYYY</label>
+			</td>
+			<td>
+				<label><STRONG>Data da Juntada:</STRONG></label></br>
+				<STRONG>DE:</STRONG>&nbsp;&nbsp;
+				<input type="text" id="dt_juntada_tdt_from_dd" name="dt_juntada_tdt_from_dd" size="2" maxlength="2" style="width:25px;" value="$!esc.html($params.get('dt_juntada_tdt_from_dd'))">/
+				<input type="text" id="dt_juntada_tdt_from_mm" name="dt_juntada_tdt_from_mm" size="2" maxlength="2" style="width:25px;" value="$!esc.html($params.get('dt_juntada_tdt_from_mm'))">/
+				<input type="text" id="dt_juntada_tdt_from_yyyy" name="dt_juntada_tdt_from_yyyy" size="4" maxlength="4" style="width:50px;" value="$!esc.html($params.get('dt_juntada_tdt_from_yyyy'))">
+				</br>
+				<STRONG>ATÉ:</STRONG>
+				<input type="text" id="dt_juntada_tdt_to_dd" name="dt_juntada_tdt_to_dd" size="2" maxlength="2" style="width:25px;" value="$!esc.html($params.get('dt_juntada_tdt_to_dd'))">/
+				<input type="text" id="dt_juntada_tdt_to_mm" name="dt_juntada_tdt_to_mm" size="2" maxlength="2" style="width:25px;" value="$!esc.html($params.get('dt_juntada_tdt_to_mm'))">/
+				<input type="text" id="dt_juntada_tdt_to_yyyy" name="dt_juntada_tdt_to_yyyy" size="4" maxlength="4" style="width:50px;" value="$!esc.html($params.get('dt_juntada_tdt_to_yyyy'))">
+				<button onclick="filterContentDate('dt_juntada_tdt');">ok</button>
+				</br>
+				<label>Padrão: DD/MM/YYYY</label>
+			</td>
+			
+			<td>
+			<label><STRONG>Tipo do Documento:</STRONG></label></br>
+			<input type="text" id="tipo_documento_s" name="tipo_documento_s" style="width:150px;" value="$!esc.html($params.get('tipo_documento_s'))"> 
+			<button onclick="filterContent('tipo_documento_s', document.getElementById('tipo_documento_s').value);">ok</button></br>
+			</td>
+
+			<td>
+			<label><STRONG>Unidade Origem:</STRONG></label></br>
+			<input type="text" id="unidade_origem_s" name="unidade_origem_s" style="width:150px;" value="$!esc.html($params.get('unidade_origem_s'))"> 
+			<button onclick="filterContent('unidade_origem_s', document.getElementById('unidade_origem_s').value);">ok</button></br>
+			</td>
+
+			<td>
+			<label><STRONG>Equipe Origem:</STRONG></label></br>
+			<input type="text" id="equipe_origem_s" name="equipe_origem_s" style="width:150px;" value="$!esc.html($params.get('equipe_origem_s'))"> 
+			<button onclick="filterContent('equipe_origem_s', document.getElementById('equipe_origem_s').value);">ok</button></br>
+			</td>
+
+			<td>
+			<label><STRONG>CPF Responsável:</STRONG></label></br>
+			<input type="text" id="cpf_responsavel_s" name="cpf_responsavel_s" style="width:150px;" value="$!esc.html($params.get('cpf_responsavel_s'))"> 
+			<button onclick="filterContent('cpf_responsavel_s', document.getElementById('cpf_responsavel_s').value);">ok</button></br>
+			</td>
+		</tr>
+		<tr style="vertical-align:top;">
+			<td>
+			<label><STRONG>Nome Usuário Juntada:</STRONG></label></br>
+			<input type="text" id="nome_usuario_juntada_doc_s" name="nome_usuario_juntada_doc_s" style="width:150px;" value="$!esc.html($params.get('nome_usuario_juntada_doc_s'))"> 
+			<button onclick="filterContent('nome_usuario_juntada_doc_s', document.getElementById('nome_usuario_juntada_doc_s').value);">ok</button></br>
+			</td>
+			
+			<td>
+			<label><STRONG>Tipo Processo:</STRONG></label></br>
+			<input type="text" id="tipo_processo_s" name="tipo_processo_s" style="width:150px;" value="$!esc.html($params.get('tipo_processo_s'))"> 
+			<button onclick="filterContent('tipo_processo_s', document.getElementById('tipo_processo_s').value);">ok</button></br>
+			</td>
+
+			<td>
+			<label><STRONG>Subtipo Processo:</STRONG></label></br>
+			<input type="text" id="subtipo_processo_s" name="subtipo_processo_s" style="width:150px;" value="$!esc.html($params.get('subtipo_processo_s'))"> 
+			<button onclick="filterContent('subtipo_processo_s', document.getElementById('subtipo_processo_s').value);">ok</button></br>
+			</td>
+
+			<td>
+			<label><STRONG>Tributo ACT:</STRONG></label></br>
+			<input type="text" id="tributo_act_s" name="tributo_act_s" style="width:150px;" value="$!esc.html($params.get('tributo_act_s'))"> 
+			<button onclick="filterContent('tributo_act_s', document.getElementById('tributo_act_s').value);">ok</button></br>
+			</td>
+
+			<td>
+			<label><STRONG>NI Contribuinte:</STRONG></label></br>
+			<input type="text" id="ni_contribuinte_l" name="ni_contribuinte_l" style="width:150px;" value="$!esc.html($params.get('ni_contribuinte_l'))"> 
+			<button onclick="filterContent('ni_contribuinte_l', document.getElementById('ni_contribuinte_l').value);">ok</button></br>
+			</td>
+
+			<td>
+			<label><STRONG>Assuntos/Objetos:</STRONG></label></br>
+			<input type="text" id="assuntos_objetos_s" name="assuntos_objetos_s" style="width:150px;" value="$!esc.html($params.get('assuntos_objetos_s'))"> 
+			<button onclick="filterContent('assuntos_objetos_s', document.getElementById('assuntos_objetos_s').value);">ok</button></br>
+			</td>
+		</tr>
+		<tr style="vertical-align:top;">
+				<td>
+				<label><STRONG>Alegações no Recurso:</STRONG></label></br>
+				<input type="text" id="aleg_recurso_contrib_txt" name="aleg_recurso_contrib_txt" style="width:150px;" value="$!esc.html($params.get('aleg_recurso_contrib_txt'))"> 
+				<button onclick="filterContent('aleg_recurso_contrib_txt', document.getElementById('aleg_recurso_contrib_txt').value);">ok</button></br>
+				</td>
+				
+				<td>
+				<label><STRONG>Título Documento:</STRONG></label></br>
+				<input type="text" id="titulo_s" name="titulo_s" style="width:150px;" value="$!esc.html($params.get('titulo_s'))"> 
+				<button onclick="filterContent('titulo_s', document.getElementById('titulo_s').value);">ok</button></br>
+				</td>
+
+				<td>
+				<label><STRONG>Nr Processo:</STRONG></label></br>
+				<input type="text" id="processo_s" name="processo_s" style="width:150px;" value="$!esc.html($params.get('processo_s'))"> 
+				<button onclick="filterContent('processo_s', document.getElementById('processo_s').value);">ok</button></br>
+				</td>
+
+				<td>
+				<label><STRONG>Nr Documento Principal:</STRONG></label></br>
+				<input type="text" id="numero_doc_princiapal_exp_s" name="numero_doc_princiapal_exp_s" style="width:150px;" value="$!esc.html($params.get('numero_doc_princiapal_exp_s'))"> 
+				<button onclick="filterContent('numero_doc_princiapal_exp_s', document.getElementById('numero_doc_princiapal_exp_s').value);">ok</button></br>
+				</td>
+
+				<td>
+				<label><STRONG>Unidade Atual:</STRONG></label></br>
+				<input type="text" id="nome_unidade_atual_s" name="nome_unidade_atual_s" style="width:150px;" value="$!esc.html($params.get('nome_unidade_atual_s'))"> 
+				<button onclick="filterContent('nome_unidade_atual_s', document.getElementById('nome_unidade_atual_s').value);">ok</button></br>
+				</td>
+
+				<td>
+				<label><STRONG>Equipe Atual:</STRONG></label></br>
+				<input type="text" id="nome_equipe_atual_s" name="nome_equipe_atual_s" style="width:150px;" value="$!esc.html($params.get('nome_equipe_atual_s'))"> 
+				<button onclick="filterContent('nome_equipe_atual_s', document.getElementById('nome_equipe_atual_s').value);">ok</button></br>
+				</td>
+			</tr>
+	</table>	
+</div>
+
+<script>
+	initializeStatus(document.getElementById("filtros_busca"), document.getElementById("status"));	
+
+function initializeStatus(element, status){
+	if(status.value == ""){
+		element.style.display = "none";
+	} else {
+		element.style.display = "block";
+	}
+		
+}	
+	
+function showHideElement(element){
+	if(element.style.display == "none"){
+		element.style.display = "block";
+		document.getElementById("status").value = "show";
+	} else {
+		element.style.display = "none";
+		document.getElementById("status").value = "";
+	}
+}
+function filterContent(field, content){
+	content = content.replace(/ /g, '\\ ');
+    document.getElementById("q").value = field + ":*" + content + "*";
+	document.getElementById('querySubmit').click();
+}
+function filterContentDate(field){
+	dateFrom = document.getElementById(field+'_from_yyyy').value + '-' + document.getElementById(field+'_from_mm').value + '-' + document.getElementById(field+'_from_dd').value;
+	dateFrom += 'T00:00:00Z';
+	
+	dateTo = document.getElementById(field+'_to_yyyy').value + '-' + document.getElementById(field+'_to_mm').value + '-' + document.getElementById(field+'_to_dd').value;
+	dateTo += 'T23:59:59Z';
+	
+	//alert( field + ":[" + dateFrom  +" TO " + dateTo + "]");
+    document.getElementById("q").value = field + ":[" + dateFrom  +" TO " + dateTo + "]";
+	document.getElementById('querySubmit').click();
+}
+</script>
+	
+
+    #if($request.params.get('debugQuery'))
+      <input type="hidden" name="debugQuery" value="true"/>
+    #end
+    #if($annotate == true)
+      <input type="hidden" name="annotateBrowse" value="true"/>
+    #end
+    #foreach($fq in $request.params.getParams('fq'))
+      #if ($fq != "{!bbox}")
+        <input type="hidden" name="fq" id="allFQs" value="$esc.html($fq)"/>
+      #end
+    #end
+
+    <div class="constraints" #annTitle("Lista de filtros ativos. Clique para remover.")>
+      #foreach($fq in $params.getParams('fq'))
+        #set($previous_fq_count=$velocityCount - 1)
+        #if($fq != '')
+          &gt;
+          <a style="{text-decoration: line-through;}"
+            href="#url_for_filters($request.params.getParams('fq').subList(0,$previous_fq_count))"
+          >$fq</a>
+        #end
+      #end
+    </div>
+
+    #parse("query_debug.vm")
+
+    #set($queryOpts = $request.params.get("queryOpts"))
+    #if($queryOpts && $queryOpts != "")
+      <input type="hidden" name="queryOpts" value="$queryOpts"/>
+    #end
+  </form>
+</div>

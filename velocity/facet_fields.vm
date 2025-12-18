@@ -1,0 +1,104 @@
+#**
+ *  Display facets based on field values
+ *  e.g.: fields specified by &facet.field=
+ *#
+
+#if($response.facetFields)
+  <h2 #annTitle("Disponibiliza as diversas vari&aacute;veis da cole&ccedil;&atilde;o para servirem como filtros para a busca em um clique. Informa, ainda, a quantidade de resultados, para cada valor de vari&aacute;vel, componente da cole&ccedil;&atilde;o.")>
+    Busca Facetada
+  </h2>
+
+#set ($labelsMap = {})
+##set ($labelsMap['nat_juridica_s'] = 'Natureza Juridica')
+##set ($labelsMap['cnpj_s'] = 'CNPJ')
+##set ($labelsMap['nome_s'] = 'Razão social')
+##set ($labelsMap['endereco_s'] = 'Endereco')
+##set ($labelsMap['bairro_s'] = 'Bairro')
+##set ($labelsMap['cep_s'] = 'CEP')
+##set ($labelsMap['nome_s'] = 'Razão social')
+##set ($labelsMap['emit_nome_fantasia_s'] = 'Nome fantasia do emitente')
+##set ($labelsMap['dest_endereco_pais_s'] = 'País do destinatário')
+##set ($labelsMap['dest_endereco_uf_s'] = 'UF do destinatário')
+##set ($labelsMap['dest_endereco_municipio_s'] = 'Município do destinatário')
+##set ($labelsMap['dest_endereco_bairro_s'] = 'Bairro do destinatário')
+##set ($labelsMap['dest_endereco_cep_s'] = 'CEP do destinatário')
+##set ($labelsMap['dest_nome_s'] = 'Razão social do destinatário')
+##set ($labelsMap['dest_nome_fantasia_s'] = 'Nome fantasia do destinatário')
+##set ($labelsMap['det_produto_nome_ss'] = 'Produtos')
+
+#set ($labelsMap['grupo_processo_s'] = 'Grupo Processo')
+#set ($labelsMap['dt_juntada_tdt'] = 'Data Juntada')
+#set ($labelsMap['tipo_processo_s'] = 'Tipo Processo')
+#set ($labelsMap['subtipo_processo_s'] = 'Subtipo Processo')
+#set ($labelsMap['processo_s'] = 'Processo')
+#set ($labelsMap['ni_contribuinte_l'] = 'NI Contribuinte')
+#set ($labelsMap['situacao_s'] = 'Situação')
+#set ($labelsMap['unidade_origem_s'] = 'Unidade Origem')
+#set ($labelsMap['equipe_origem_s'] = 'Equipe Origem')
+#set ($labelsMap['cpf_signatarios_s'] = 'CPF Signatário')
+#set ($labelsMap['cpf_responsavel_s'] = 'CPF Responsável')
+#set ($labelsMap['tipo_documento_s'] = 'Tipo Documento')
+#set ($labelsMap['nome_contribuinte_s'] = 'Nome Contribuinte')
+#set ($labelsMap['nome_equipe_atual_s'] = 'Nome Equipe Atual')
+#set ($labelsMap['nome_unidade_atual_s'] = 'Nome Unidade Atual')
+#set ($labelsMap['tributo_act_s'] = 'Tributo ACT do Processo')
+#set ($labelsMap['tributo_processo_s'] = 'Tributo Processo')
+
+#foreach($field in $response.facetFields)
+## Hide facets without value
+    #if($field.values.size() > 0)   
+        #if($field.name=="dt_juntada_tdt")
+            ##$date.format('dd-MM-yyyy', $incoming.dt_juntada_tdt)
+            <span class="facet-field">#if($labelsMap.get($field.name)) $labelsMap.get($field.name) #else $field.name #end</span>
+            <ul>
+            #foreach($facet in $field.values)
+                <li>
+                ##set($enhancedFacet = "{!tag=1.1}$field.name")
+                <a href="#url_for_facet_filter($field.name, $facet.name)" title="$esc.html($facet.name)">                 
+                 #if($facet.name!=$null)
+                    #set($dt_juntada_tdt = $facet.name.substring(8,10)+"/"+$facet.name.substring(5,7)+"/"+$facet.name.substring(0,4)+ " " + $facet.name.substring(11,16))
+                    $esc.html($dt_juntada_tdt)#else<em>missing</em>#end</a> ($number.format('#,##0',$facet.count))                
+                </li>
+                #end
+            </ul> 
+        #elseif($field.name=="cpf_signatarios_s")            
+            <span class="facet-field">#if($labelsMap.get($field.name)) $labelsMap.get($field.name) #else $field.name #end</span>
+            <ul>
+            #foreach($facet in $field.values)
+                <li>
+                ##set($enhancedFacet = "{!tag=1.1}$field.name")
+                <a href="#url_for_facet_filter($field.name, $facet.name)" title="$esc.html($facet.name)">
+                 #if($facet.name!=$null && $facet.name.length()==11)
+                    #set($cpf_signatarios_s = $facet.name.substring(0,3)+"."+$facet.name.substring(3,6)+"."+$facet.name.substring(6,9)+"-"+$facet.name.substring(9,11))
+                    $esc.html($cpf_signatarios_s)#else<em>$facet.name</em>#end</a> ($number.format('#,##0',$facet.count))
+                </li>
+                #end
+            </ul> 
+        #elseif($field.name=="cpf_responsavel_s")            
+            <span class="facet-field">#if($labelsMap.get($field.name)) $labelsMap.get($field.name) #else $field.name #end</span>
+            <ul>
+            #foreach($facet in $field.values)
+                <li>
+                ##set($enhancedFacet = "{!tag=1.1}$field.name")
+                <a href="#url_for_facet_filter($field.name, $facet.name)" title="$esc.html($facet.name)">
+                 #if($facet.name!=$null && $facet.name.length()==11)
+                 #set($cpf_responsavel_s = $facet.name.substring(0,3)+"."+$facet.name.substring(3,6)+"."+$facet.name.substring(6,9)+"-"+$facet.name.substring(9,11))
+                    $esc.html($cpf_responsavel_s)#else<em>$facet.name</em>#end</a> ($number.format('#,##0',$facet.count))
+                </li>
+                #end
+            </ul>
+        #else
+            <span class="facet-field">#if($labelsMap.get($field.name)) $labelsMap.get($field.name) #else $field.name #end</span>
+            <ul>
+            #foreach($facet in $field.values)
+                <li>
+                ##set($enhancedFacet = "{!tag=1.1}$field.name")
+                <a href="#url_for_facet_filter($field.name, $facet.name)" title="$esc.html($facet.name)">
+                 #if($facet.name!=$null)$esc.html($display.truncate($facet.name,25))#else<em>missing</em>#end</a> ($number.format('#,##0',$facet.count))
+                </li>
+                #end
+            </ul>   
+        #end
+    #end  ## end if > 0
+  #end    ## end for each facet field
+#end      ## end if response has facet fields

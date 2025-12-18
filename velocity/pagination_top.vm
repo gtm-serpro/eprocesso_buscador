@@ -1,0 +1,33 @@
+#**
+ *  Paging and Statistics at top of results
+ *#
+
+## Usually rendered in pagination div tag
+
+## Grouped Results / Not Paginated
+#if($response.response.get('grouped'))
+
+  <span>
+    <span class="results-found">
+      $response.response.get('grouped').size() group(s)
+    </span>
+    found in ${response.responseHeader.QTime} ms
+  </span>
+
+## Regular Results / Use Paging Links if needed
+#else
+
+  <span>
+    <span class="results-found">$number.format('#,##0',$page.results_found)</span>
+    resultados encontrados em 
+    ${response.responseHeader.QTime} ms.
+  </span>
+
+  #link_to_previous_page("anterior")
+
+  P&aacute;gina <span class="page-num">$page.current_page_number</span>
+    de <span class="page-count">$number.format('#,##0',$page.page_count)</span>
+
+  #link_to_next_page("pr&oacute;xima")
+
+#end   ## end else non-grouped results, normal pagination

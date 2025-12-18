@@ -1,0 +1,436 @@
+#**
+ *  Provide elements for the <head> section of the HTML document
+ *#
+
+	## An example of using an arbitrary request parameter
+	<title>Projeto VER - Eprocesso Buscador</title>
+	<meta name="author" content="Eduardo Saint Clair">
+	<meta name="contact" content="eduardo.saintclair@serpro.gov.br">
+	<meta name="description" content="O VER &eacute; um servi&ccedil;o de busca e agrega&ccedil;&atilde;o de alt&iacute;ssimo desempenho em cole&ccedil;&otilde;es de dados que possui interface amig&aacute;vel para homens e m&aacute;quinas e permite a an&aacute;lise e cruzamento das diversas fontes de dados, estruturados ou n&atilde;o, do SERPRO e de clientes.">
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  
+
+	<!--<script type="text/javascript" src="/compras/js/jquery-1.7.2.min.js"></script>  -->
+	<!--<link rel="stylesheet" type="text/css" href="/compras/css/jquery.autocomplete.css" />-->
+	<!--<script type="text/javascript" src="/compras/js/jquery.autocomplete.js"></script>-->	
+	<!-- link rel="icon" type="image/x-icon" href="/compras/img/favicon.ico"/ -->
+	
+	<link rel="shortcut icon" type="image/png" href="/compras/img/favicon.png"/>
+	<link rel="stylesheet" type="text/css" href="/compras/css/main.css" />
+  
+	<script type="text/javascript" src="/fusioncharts/js/fusioncharts.js"></script>
+	<script type="text/javascript" src="/fusioncharts/js/themes/fusioncharts.theme.fint.js"></script>
+
+	<script type="text/javascript" src="/js/contrast.js"></script>
+	<link rel="stylesheet" type="text/css" href="/css/contrast.css">
+	<link rel="stylesheet" type="text/css" href="/css/principal.css">
+	
+	<link rel="stylesheet" href="/css/jquery-ui.css">
+    <script src="/js/jquery-3.6.0.js"></script>
+    <script src="/js/jquery-ui.js"></script>
+	
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		.query-box {
+			font-family: Arial, Helvetica, sans-serif;
+			font-size: 14px;
+		}
+
+		.search-container {
+			background: white;
+			border-radius: 12px;
+			padding: 30px;
+			box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+			margin-bottom: 20px;
+		}
+
+		.search-input-wrapper {
+			display: flex;
+			gap: 10px;
+			align-items: center;
+			margin-bottom: 15px;
+		}
+
+		.search-input-wrapper label {
+			font-weight: bold;
+			color: #0071BC;
+			font-size: 16px;
+			min-width: 60px;
+		}
+
+		#q {
+			flex: 1;
+			height: 48px;
+			border: 2px solid #ddd;
+			font-size: 16px;
+			padding: 0 16px;
+			border-radius: 8px;
+			transition: all 0.3s;
+		}
+
+		#q:focus {
+			outline: none;
+			border-color: #0071BC;
+			box-shadow: 0 0 0 3px rgba(0,113,182,0.1);
+		}
+
+		.btn {
+			padding: 12px 24px;
+			border: none;
+			border-radius: 8px;
+			font-weight: bold;
+			font-size: 14px;
+			cursor: pointer;
+			transition: all 0.3s;
+			box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+		}
+
+		.btn-primary {
+			background: #0071BC;
+			color: white;
+		}
+
+		.btn-primary:hover {
+			background: #005a94;
+			transform: translateY(-1px);
+			box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+		}
+
+		.btn-secondary {
+			background: #666;
+			color: white;
+		}
+
+		.btn-secondary:hover {
+			background: #4A4A4A;
+		}
+
+		.btn-filters {
+			background: white;
+			color: #0071BC;
+			border: 2px solid #0071BC;
+		}
+
+		.btn-filters:hover {
+			background: #0071BC;
+			color: white;
+		}
+
+		.dialog-overlay {
+			display: none;
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background: rgba(0,0,0,0.5);
+			z-index: 9998;
+			animation: fadeIn 0.3s;
+		}
+
+		.dialog-overlay.active {
+			display: block;
+		}
+
+		@keyframes fadeIn {
+			from { opacity: 0; }
+			to { opacity: 1; }
+		}
+
+		@keyframes slideUp {
+			from {
+				opacity: 0;
+				transform: translateY(20px);
+			}
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+
+		.dialog-box {
+			display: none;
+			position: fixed;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			background: white;
+			border-radius: 12px;
+			box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+			z-index: 9999;
+			max-width: 1200px;
+			max-height: 85vh;
+			width: 95%;
+			overflow: hidden;
+			animation: slideUp 0.3s;
+		}
+
+		.dialog-box.active {
+			display: flex;
+			flex-direction: column;
+		}
+
+		.dialog-header {
+			background: linear-gradient(135deg, #0071BC 0%, #005a94 100%);
+			color: white;
+			padding: 20px 30px;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		.dialog-header h2 {
+			font-size: 20px;
+			font-weight: bold;
+		}
+
+		.dialog-close {
+			background: rgba(255,255,255,0.2);
+			border: none;
+			color: white;
+			width: 32px;
+			height: 32px;
+			border-radius: 50%;
+			cursor: pointer;
+			font-size: 20px;
+			transition: all 0.3s;
+		}
+
+		.dialog-close:hover {
+			background: rgba(255,255,255,0.3);
+			transform: rotate(90deg);
+		}
+
+		.dialog-body {
+			padding: 30px;
+			overflow-y: auto;
+		}
+
+		.dialog-footer {
+			padding: 20px 30px;
+			background: #f8f8f8;
+			border-top: 1px solid #e0e0e0;
+			display: flex;
+			gap: 10px;
+			justify-content: flex-end;
+		}
+
+		.filter-section {
+			margin-bottom: 30px;
+			padding: 20px;
+			background: #f9f9f9;
+			border-radius: 8px;
+			border: 1px solid #e0e0e0;
+		}
+
+		.filter-section h3 {
+			color: #0071BC;
+			font-size: 16px;
+			margin-bottom: 15px;
+			padding-bottom: 10px;
+			border-bottom: 2px solid #0071BC;
+		}
+
+		.form-grid {
+			display: grid;
+			grid-template-columns: repeat(3, 1fr);
+			gap: 16px;
+		}
+
+		.form-grid-2 {
+			grid-template-columns: repeat(2, 1fr);
+		}
+
+		.form-group {
+			display: flex;
+			flex-direction: column;
+		}
+
+		.form-group label {
+			font-weight: bold;
+			margin-bottom: 5px;
+			color: #333;
+			font-size: 13px;
+		}
+
+		.field-group {
+			display: flex;
+			gap: 8px;
+			align-items: center;
+		}
+
+		.field-group input[type="text"] {
+			flex: 1;
+			padding: 10px;
+			border: 1px solid #ddd;
+			border-radius: 6px;
+			font-size: 14px;
+			transition: all 0.3s;
+		}
+
+		.field-group input[type="text"]:focus {
+			outline: none;
+			border-color: #0071BC;
+			box-shadow: 0 0 0 3px rgba(0,113,182,0.1);
+		}
+
+		.toggle-switch {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			gap: 6px;
+			cursor: pointer;
+			border: 1px solid #ccc;
+			background-color: #f9f9f9;
+			color: #333;
+			border-radius: 6px;
+			padding: 0 12px;
+			font-size: 0.875rem;
+			font-weight: 500;
+			transition: all 0.2s ease;
+			height: 38px;
+			box-sizing: border-box;
+			user-select: none;
+		}
+
+		.toggle-switch:hover {
+			background-color: #f1f1f1;
+			border-color: #bbb;
+		}
+
+		.toggle-switch .toggle-icon {
+			font-size: 1rem;
+			line-height: 1;
+		}
+
+		.toggle-switch.exclude {
+			background-color: #ffe6e6;
+			border-color: #e57373;
+			color: #b71c1c;
+		}
+
+		.toggle-switch.exclude:hover {
+			background-color: #ffd6d6;
+			border-color: #ef5350;
+		}
+
+		.toggle-text {
+			font-size: 0.875rem;
+			line-height: 1;
+		}
+
+		.form-group input[type="text"]:not(.field-group input) {
+			padding: 10px;
+			border: 1px solid #ddd;
+			border-radius: 6px;
+			font-size: 14px;
+			transition: all 0.3s;
+		}
+
+		.form-group input[type="text"]:not(.field-group input):focus {
+			outline: none;
+			border-color: #0071BC;
+			box-shadow: 0 0 0 3px rgba(0,113,182,0.1);
+		}
+
+		.date-inputs {
+			display: flex;
+			align-items: center;
+			gap: 5px;
+		}
+
+		.date-inputs input {
+			padding: 8px;
+			border: 1px solid #ddd;
+			border-radius: 4px;
+			text-align: center;
+		}
+
+		.date-inputs input:first-child {
+			width: 50px;
+		}
+
+		.date-inputs input:nth-child(3) {
+			width: 50px;
+		}
+
+		.date-inputs input:last-child {
+			width: 70px;
+		}
+
+		.date-group {
+			display: flex;
+			flex-direction: column;
+			gap: 8px;
+		}
+
+		.date-row {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+		}
+
+		.date-row label {
+			min-width: 40px;
+			font-weight: bold;
+		}
+
+		.valor-range {
+			grid-column: span 2;
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 16px;
+			background-color: #ddd;
+			padding: 8px 12px;
+			border-radius: 4px;
+		}
+
+		.constraints {
+			margin-top: 10px;
+			font-size: 12px;
+			color: #666;
+		}
+
+		.constraints a {
+			color: #0071BC;
+			text-decoration: none;
+			margin-left: 5px;
+		}
+
+		.constraints a:hover {
+			text-decoration: underline;
+		}
+
+		@media (max-width: 768px) {
+			.form-grid {
+				grid-template-columns: 1fr;
+			}
+			
+			.dialog-box {
+				width: 100%;
+				height: 100%;
+				max-height: 100vh;
+				border-radius: 0;
+			}
+		}
+	</style>
+	
+	<script>
+
+	$(document).ready(function(){
+	 //$("#q").autocomplete({ source: '#{url_for_solr}/terms?&terms.sort=count&terms.fl=_texto&wt=velocity&v.template=suggest&terms.prefix='+$("#q").val()}       
+	  //)
+	  $("\#q").keydown(function(e){   
+        if (e.keyCode === 13){
+          $("#query-form").trigger('submit');
+        }
+      });
+		
+	});
+    </script>

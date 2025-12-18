@@ -1,0 +1,33 @@
+#**
+ *  Display facets based on ranges of values, AKA "Bukets"
+ *  e.g.: ranges specified by &facet.range=
+ *#
+
+<h2 #annTitle("Facetas, com faixas de valores clic&aacute;veis, para filtros de busca")>
+  Filtros de Intervalo
+</h2>
+
+
+#set ($labelsMap = {})
+#set ($labelsMap['data_emissao'] = 'Ano da emissão')
+#set ($labelsMap['total_valor_nota'] = 'Valor total da Nota (R$)')
+
+
+#foreach ($field in $response.response.facet_counts.facet_ranges)
+  ## Hide facets without value
+  #if($field.value.counts.size() > 0)
+	#set($name = $field.key)
+        #if($labelsMap.get($field.key))
+          #set($display = $labelsMap.get($field.key))
+        #else
+          #set($display = $field.key)
+        #end
+	#set($f = $field.value.counts)
+	#set($start = $field.value.start)
+	#set($end = $field.value.end)
+	#set($gap = $field.value.gap)
+	#set($before = $field.value.before)
+	#set($after = $field.value.after)
+	#display_facet_range($f, $display, $name, $start, $end, $gap, $before, $after)
+  #end  ## end if has any values
+#end    ## end for each facet range

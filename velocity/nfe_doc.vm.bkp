@@ -1,0 +1,176 @@
+#**
+ *  Render a hit representing a Compra
+ *  assumed to have a field called "no_objeto_compra_ss"
+ *#
+
+#if($doc.getFieldValue('id'))
+   #set($id = "#field('id')")
+   ##set($id_disp = $id_disp.replace("/mnt/", ""))
+   #set($link =    'https://eprocesso.suiterfb.receita.fazenda/eprocesso/api/documentos/'+$id.trim()+'/obterbinario/download')
+   #set($linkOCR = 'https://eprocesso-preproducao.suiterfb.receita.fazenda/eprocesso/api/documentos/'+$id.trim()+'/obterbinarioocr/download')
+#end
+
+
+<div class="result-title">
+
+## Icon
+  ## Small file type icons from http://www.splitbrain.org/projects/file_icons (public domain)
+  ##<img src="#{url_root}/img/filetypes/pdf.png" align="center">
+<b>
+#if($doc.getFieldValue('arquivo_indexado_s')=='S')
+<a href='$link' target='_blank'> <img src="#{url_root}/img/filetypes/pdf.png" align="top"> </a>
+    #if($doc.getFieldValue('indicador_pesquisavel_s')=='S')
+        <a href='$linkOCR' target='_blank'> <img src="#{url_root}/img/filetypes/pdf.png" align="top"> </a>
+    #end
+    <b>
+    #if($doc.getFieldValue('id')) 
+        #if($doc.getFieldValue('titulo_s')) 
+            #set( $campo = $doc.getFieldValue('tipo_documento_s') + " - " + $doc.getFieldValue('titulo_s') )
+            $campo
+        #else
+            $doc.getFieldValue('tipo_documento_s')
+        #end
+    #else<i>Indefinido</i>
+    #end</b>
+    #else
+    <img src="#{url_root}/img/filetypes/pdf.png" align="top">
+    <b>
+    #if($doc.getFieldValue('id')) 
+        #if($doc.getFieldValue('titulo_s')) 
+            #set( $campo = $doc.getFieldValue('tipo_documento_s') + " - " + $doc.getFieldValue('titulo_s') )
+            $campo
+        #else
+            $doc.getFieldValue('tipo_documento_s')
+        #end
+    #else<i>Indefinido</i>
+    #end</b>
+#end
+</b>
+ ##if($doc.getFieldValue('attr_stream_size') && $number.integer($doc.getFieldValue('attr_stream_size').get(0))!=0) ($number.format('#,##0',$number.integer($doc.getFieldValue('attr_stream_size').get(0))) bytes)#end
+
+<span class="mlt" style="display:none;">  #if($params.getBool('mlt', false) == false)<a href="#lensNoQ&q=id:$docId&mlt=true">Mais consultas como esta   </a>#end</span> </div>
+##do we have a physical store for this product
+##set($store = $doc.getFieldValue('store'))
+##if($store)<div class="map"><img src="http://maps.google.com/maps/api/staticmap?&zoom=12&size=150x80&maptype=roadmap&markers=$doc.getFieldValue('store')&sensor=false" /><div><small><a target="_map" href="http://maps.google.com/?q=$store&amp;source=embed">Larger Map</a></small></div></div>#end
+
+
+## TESTE E-PROCESSO
+#if($doc.getFieldValue('processo_s'))<div><strong>Numero do processo:</strong> #field('processo_s')</div>#end
+#if($doc.getFieldValue('dt_protocolo_tdt'))<div><strong>Data do protocolo:</strong> $date.format('dd/MM/Y HH:mm',$doc.getFieldValue('dt_protocolo_tdt'))</div>#end
+
+#if($doc.getFieldValue('dt_anexacao_tdt'))<div><strong>Data anexa&ccedil;&atilde;o:</strong> $date.format('dd/MM/Y HH:mm',$doc.getFieldValue('dt_anexacao_tdt'))</div>#end
+#if($doc.getFieldValue('tipo_documento_s'))<div><strong>Tipo documento:</strong> #field('tipo_documento_s')</div>#end
+#if($doc.getFieldValue('titulo_s'))<div><strong>T&iacute;tulo documento:</strong> #field('titulo_s')</div>#end
+
+#if($doc.getFieldValue('grupo_processo_s'))<div><strong>Grupo processo:</strong> #field('grupo_processo_s')</div>#end
+#if($doc.getFieldValue('tipo_processo_s'))<div><strong>Tipo processo:</strong> #field('tipo_processo_s')</div>#end
+#if($doc.getFieldValue('subtipo_processo_s'))<div><strong>Subtipo processo:</strong> #field('subtipo_processo_s')</div>#end
+##if($doc.getFieldValue('nome_responsavel_s'))<div><strong>Nome respons&aacute;vel:</strong> #field('nome_responsavel_s')</div>#end
+#if($doc.getFieldValue('equipe_origem_s'))<div><strong>Equipe:</strong> #field('equipe_origem_s')</div>#end
+
+
+#if($doc.getFieldValue('secao_s'))<div><strong>Se&ccedil;&atilde;o:</strong> #field('secao_s')</div>#end
+#if($doc.getFieldValue('dt_sessao_tdt'))<div><strong>Data da sess&atilde;o:</strong> #field('dt_sessao_tdt')</div>#end
+#if($doc.getFieldValue('dt_publicacao_tdt'))<div><strong>Data da publica&ccedil;&atilde;o:</strong> #field('dt_publicacao_tdt')</div>#end
+#if($doc.getFieldValue('ementa_s'))<div><strong>Ementa:</strong> #field('ementa_s')</div>#end
+#if($doc.getFieldValue('numero_decisao_s'))<div><strong>Numero da decis&atilde;o:</strong> #field('numero_decisao_s')</div>#end
+#if($doc.getFieldValue('decisao_s'))<div><strong>Decis&atilde;o:</strong> #field('decisao_s')</div>#end
+#if($doc.getFieldValue('materia_s'))<div><strong>Mat&eacute;ria:</strong> #field('materia_s')</div>#end
+#if($doc.getFieldValue('nome_relator_s'))<div><strong>Nome do relator:</strong> #field('nome_relator_s')</div>#end
+
+<hr>
+#if($doc.getFieldValue('det_numero_item_ss') && $doc.getFieldValue('det_numero_item_ss').size() > 0)
+   <div>
+     <table cellspacing="7">
+      <tr>
+      <th align=left>C&oacute;digo</th>
+      <th align=left>NCM</th>
+      <th align=right>CFOP</th>
+      <th align=right>Qtd.</th>
+      <th align=left>Unid.</th>
+      <th align=right>Valor unit&aacute;rio</th>
+      <th align=right>Valor total</th>
+      <th align=left>Nome do produto</th>
+      </tr>
+   #set($pos=0)
+   #foreach($prd in $doc.getFieldValue('det_numero_item_ss'))
+      #set($prd_cod = $doc.getFieldValue('det_produto_codigo_ss').get($pos))
+      #set($prd_ncm = $doc.getFieldValue('det_produto_ncm_tis').get($pos))
+      #set($prd_cfop= $doc.getFieldValue('det_produto_cfop_tis').get($pos))
+      #set($prd_qtd = $doc.getFieldValue('det_produto_quantidade_tfs').get($pos))
+      #set($prd_uni = $doc.getFieldValue('det_produto_unidade_ss').get($pos))
+      #set($prd_valuni = $number.format('R$ #,##0.00',$doc.getFieldValue('det_produto_valor_unitario_tfs').get($pos)))
+      #set($prd_valtot = $number.format('R$ #,##0.00',$doc.getFieldValue('det_produto_valor_tfs').get($pos)))
+      #set($prd_nome = $doc.getFieldValue('det_produto_nome_ss').get($pos))
+      <tr>
+      <td align=left>#if($prd_cod)$prd_cod#end</td>
+      <td align=right>#if($prd_ncm)$prd_ncm#end</td>
+      <td align=right>#if($prd_cfop)$prd_cfop#end</td>
+      <td align=right>#if($prd_qtd)$prd_qtd#end</td>
+      <td align=left>#if($prd_uni)$prd_uni#end</td>
+      <td align=right>#if($prd_valuni)$prd_valuni#end</td>
+      <td align=right>#if($prd_valtot)$prd_valtot#end</td>
+      <td align=left>#if($prd_nome)$prd_nome#end</td>
+      </tr>
+      #set($pos=$pos+1)
+   #end
+      </table>
+   </div>
+#end
+
+
+<div>
+<table cellspacing="7">
+#if($doc.getFieldValue('total_valor_produto'))<tr><td><strong>Total Produtos:</strong></td><td align=right>$number.format('R$ #,##0.00',$doc.getFieldValue('total_valor_produto'))</td></tr>#end
+#if($doc.getFieldValue('total_valor_frete')&&$doc.getFieldValue('total_valor_frete')>0)<tr><td><strong>Total Frete:</strong></td><td align=right>$number.format('R$ #,##0.00',$doc.getFieldValue('total_valor_frete'))</td></tr>#end
+#if($doc.getFieldValue('total_valor_bc')&&$doc.getFieldValue('total_valor_bc')>0)<tr><td><strong>Total BC:</strong></td><td align=right>$number.format('R$ #,##0.00',$doc.getFieldValue('total_valor_bc'))</td></tr>#end
+#if($doc.getFieldValue('total_valor_bcst')&&$doc.getFieldValue('total_valor_bcst')>0)<tr><td><strong>Total BCST:</strong></td><td align=right>$number.format('R$ #,##0.00',$doc.getFieldValue('total_valor_bcst'))</td></tr>#end
+#if($doc.getFieldValue('total_valor_st')&&$doc.getFieldValue('total_valor_st')>0)<tr><td><strong>Total ST:</strong></td><td align=right>$number.format('R$ #,##0.00',$doc.getFieldValue('total_valor_st'))</td></tr>#end
+#if($doc.getFieldValue('total_valor_icms')&&$doc.getFieldValue('total_valor_icms')>0)<tr><td><strong>Total ICMS:</strong></td><td align=right>$number.format('R$ #,##0.00',$doc.getFieldValue('total_valor_icms'))</td></tr>#end
+#if($doc.getFieldValue('total_valor_icms_desonerado')&&$doc.getFieldValue('total_valor_icms_desonerado')>0)<tr><td><strong>Total ICMS desonerado:</strong></td><td align=right>$number.format('R$ #,##0.00',$doc.getFieldValue('total_valor_icms_desonerado'))</td></tr>#end
+#if($doc.getFieldValue('total_valor_ipi')&&$doc.getFieldValue('total_valor_ipi')>0)<tr><td><strong>Total IPI:</strong></td><td align=right>$number.format('R$ #,##0.00',$doc.getFieldValue('total_valor_ipi'))</td></tr>#end
+#if($doc.getFieldValue('total_valor_pis')&&$doc.getFieldValue('total_valor_pis')>0)<tr><td><strong>Total PIS:</strong></td><td align=right>$number.format('R$ #,##0.00',$doc.getFieldValue('total_valor_pis'))</td></tr>#end
+#if($doc.getFieldValue('total_valor_cofins')&&$doc.getFieldValue('total_valor_cofins')>0)<tr><td><strong>Total COFINS:</strong></td><td align=right>$number.format('R$ #,##0.00',$doc.getFieldValue('total_valor_cofins'))</td></tr>#end
+#if($doc.getFieldValue('total_valor_seguro')&&$doc.getFieldValue('total_valor_seguro')>0)<tr><td><strong>Total Seguro:</strong></td><td align=right>$number.format('R$ #,##0.00',$doc.getFieldValue('total_valor_seguro'))</td></tr>#end
+#if($doc.getFieldValue('total_valor_ii')&&$doc.getFieldValue('total_valor_ii')>0)<tr><td><strong>Total II:</strong></td><td align=right>$number.format('R$ #,##0.00',$doc.getFieldValue('total_valor_ii'))</td></tr>#end
+#if($doc.getFieldValue('total_valor_desconto')&&$doc.getFieldValue('total_valor_desconto')>0)<tr><td><strong>Total Desconto:</strong></td><td align=right>$number.format('R$ #,##0.00',$doc.getFieldValue('total_valor_desconto'))</td></tr>#end
+#if($doc.getFieldValue('total_valor_outro')&&$doc.getFieldValue('total_valor_outro')>0)<tr><td><strong>Total Outro:</strong></td><td align=right>$number.format('R$ #,##0.00',$doc.getFieldValue('total_valor_outro'))</td></tr>#end
+#if($doc.getFieldValue('total_valor_total_tributado')&&$doc.getFieldValue('total_valor_total_tributado')>0)<tr><td><strong>Total Tributado:</strong></td><td align=right>$number.format('R$ #,##0.00',$doc.getFieldValue('total_valor_total_tributado'))</td></tr>#end
+#if($doc.getFieldValue('total_valor_nota')&&$doc.getFieldValue('total_valor_nota')>0)<tr><td><strong>Total Nota:</strong></td><td align=right>$number.format('R$ #,##0.00',$doc.getFieldValue('total_valor_nota'))</td></tr>#end
+</table>
+</div>
+
+
+<div>#if($doc.getFieldValue('transporte_modo_frete'))<strong>Modo frete:</strong> #field('transporte_modo_frete')#end #if($doc.getFieldValue('transporte_volumes_quantidade'))<strong> Volume Qtd.:</strong> #field('transporte_volumes_quantidade')#end #if($doc.getFieldValue('transporte_volumes_peso_bruto'))<strong> Peso bruto:</strong> #field('transporte_volumes_peso_bruto')#end #if($doc.getFieldValue('transporte_volumes_peso_liquido'))<strong> Peso l&iacute;quido:</strong> #field('transporte_volumes_peso_liquido')#end</div>
+<div>#if($doc.getFieldValue('transporte_transportadora_nome_s'))<strong>Transportadora:</strong> #field('transporte_transportadora_nome_s')#end #if($doc.getFieldValue('transporte_transportadora_cnpj_s'))<strong> &nbsp; CNPJ:</strong> #field('transporte_transportadora_cnpj_s')#end #if($doc.getFieldValue('transporte_transportadora_ie_s'))<strong> &nbsp; Insc.Estadual:</strong> #field('transporte_transportadora_ie_s')#end</div>
+
+#set($mapa_transp="")
+<div>#if($doc.getFieldValue('transporte_transportadora_endereco_s'))<strong>Endere&ccedil;o:</strong> #field('transporte_transportadora_endereco_s') #set($mapa_transp=$doc.getFieldValue('transporte_transportadora_endereco_s'))#end
+ #if($doc.getFieldValue('transporte_transportadora_municipio_s')) - #field('transporte_transportadora_municipio_s') #set($mapa_transp="$mapa_transp $doc.getFieldValue('transporte_transportadora_municipio_s')")#end
+ #if($doc.getFieldValue('transporte_transportadora_uf_s')) - #field('transporte_transportadora_uf_s')#end
+ #if($mapa_transp!='') <a target="_map" href="http://maps.google.com/?q=$mapa_transp&amp;source=embed">mapa</a>#end</div>
+
+#if($doc.getFieldValue('informacao_complementar'))<hr><div><strong>Informa&ccedil;&atilde;o complementar:</strong> #field('informacao_complementar')</div>#end
+##if($doc.getFieldValue(''))<div><strong>:</strong> #field('')</div>#end
+##if($doc.getFieldValue(''))<div><strong>:</strong> #field('')</div>#end
+##if($doc.getFieldValue(''))<div><strong>:</strong> #field('')</div>#end
+##if($doc.getFieldValue(''))<div><strong>:</strong> #field('')</div>#end
+<div class="mlt">
+  #set($mlt = $mltResults.get($docId))
+  #set($mltOn = $params.getBool('mlt'))
+  #if($mltOn == true)<div class="field-name">Similar Items</div>#end
+  #if ($mltOn && $mlt && $mlt.size() > 0)
+  <ul>
+    #foreach($mltHit in $mlt)
+      #set($mltId = $mltHit.getFieldValue('id'))
+      <li><div><a href="#url_for_home?q=id:$mltId">$mltId</a></div><div><span class="field-name">Name:</span> $mltHit.getFieldValue('name')</div>
+        <div><span class="field-name">Price:</span> $!number.currency($mltHit.getFieldValue('price')) <span class="field-name">In Stock:</span> $mltHit.getFieldValue('inStock')</div>
+
+      </li>
+    #end
+  </ul>
+  #elseif($mltOn && $mlt.size() == 0)
+    <div>No Similar Items Found</div>
+  #end
+</div>
+#parse('debug.vm')

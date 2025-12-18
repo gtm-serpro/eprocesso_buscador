@@ -1,0 +1,82 @@
+<div class="parsed_query_header">
+  #if($request.params.get('debugQuery'))
+    <a href="#" onclick='jQuery(this).siblings("div").toggle(); return false;'>mostrar execu&ccedil;&atilde;o da query</a>
+    <div class="parsed_query" style="display:none">$response.response.debug.parsedquery</div>
+    <div id="chart_times" style="display:none">Tempos</div>
+    <script type="text/javascript">
+ FusionCharts.ready(function () {
+   var times_chart = new FusionCharts({
+        type: 'zoomline',
+        renderAt: 'chart_times',
+        width: '1200',
+        height: '400',
+        dataFormat: 'json',
+        dataSource: {
+            "chart": {
+                "caption": "Tempos de resposta do cluster",
+                "subcaption": "Plataforma VER",
+##                "paletteColors": "#0075c2,#1aaf5d",
+                "captionFontSize": "14",
+                "subcaptionFontSize": "14",
+                "subcaptionFontBold": "0",
+                "showBorder": "0",
+                "bgColor": "#ffffff",
+                "baseFont": "Helvetica Neue,Arial",
+                "showCanvasBorder": "0",
+                "showShadow": "0",
+                "showAlternateHGridColor": "0",
+                "canvasBgColor": "#ffffff",
+                "yaxisname": "Tempos (ms)",
+                "xaxisname": "Shard",
+##                "yaxisminValue": "800",
+##                "yaxismaxValue": "1400",
+                "forceAxisLimits" : "0",
+                "pixelsPerPoint": "0",
+                "pixelsPerLabel": "30",
+                "lineThickness": "1",
+                "compactdatamode" : "1",
+                "dataseparator" : "@",
+                "labelHeight": "30",                
+                "scrollheight": "10",
+                "flatScrollBars": "1",
+                "scrollShowButtons": "0",
+                "scrollColor": "#cccccc",
+                "legendBgAlpha": "0",
+                "legendBorderAlpha": "0",
+                "legendShadow": "0",
+                "legendItemFontSize": "10",
+                "legendItemFontColor": "#666666",
+                "theme": "fint"
+            },
+		"categories": [{
+		"category":  "#foreach($value in $response.response.debug.track.EXECUTE_QUERY)$esc.html($value.key)@#end"
+            }],
+		"dataset": [
+			{
+			"seriesname": "query",
+			"data": "#foreach($value in $response.response.debug.track.EXECUTE_QUERY)$value.value.get('QTime')@#end"
+			}, 
+			{
+			"seriesname": "query total",
+			"data": "#foreach($value in $response.response.debug.track.EXECUTE_QUERY)$value.value.get('ElapsedTime')@#end"
+			},
+			{
+			"seriesname": "fields",
+			"data": "#foreach($value in $response.response.debug.track.GET_FIELDS)$value.value.get('QTime')@#end"
+			}, 
+			{
+			"seriesname": "fields total",
+			"data": "#foreach($value in $response.response.debug.track.GET_FIELDS)$value.value.get('ElapsedTime')@#end"
+			},
+			{
+			"seriesname": "resposta final",
+			"data": "#foreach($value in $response.response.debug.track.EXECUTE_QUERY)${response.responseHeader.QTime}@#end"
+			} 
+			]
+        }
+    });
+    times_chart.render();
+});
+    </script>
+  #end
+</div>

@@ -1,0 +1,1865 @@
+#**
+ *  Renders the main query form
+ *#
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+/* adaptado do site trasnparencia.gov */
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, font, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    /*font-weight: inherit;*/
+    font-style: inherit;
+    font-size: 100%;
+    font-family: inherit;
+}
+
+html, body {
+    height: 100%;
+    padding-bottom: 0px;
+}
+
+body {
+    line-height: 1.1;
+    color: black;
+    background: white;
+    font-family: Arial;
+}
+
+body {min-width: 1004px;}
+
+.stickyFooterWrapper {
+}
+
+
+.portalheader {
+	height: 105px;
+	padding-top: 40px;
+    background: url(../img/bg-header.png);
+    background-repeat: repeat-x;
+}
+
+.header_content {
+    width: 725px;
+    margin: 0 auto;
+    position: relative;
+}
+.header_content .logo_sistema {
+    left: -117px;
+    position: absolute;
+    top: -27px;
+}
+.header_content .logo_sistema img {
+    /*border: 3px solid #fff;
+    border-radius: 2px;
+    height: 115px;
+    width: 91px;*/
+}
+
+
+
+h1.marca a {
+    font-size: 3.35em;
+    text-decoration: none;
+    color: #FFF;
+    display: none;
+}
+
+.acessoAInformacao {
+	padding-top: 20px;
+	float: left;
+}
+
+.assinatura {
+    padding-top: 20px;
+    text-align: right;
+}
+.rodape {
+    background-color: #00420c;
+    /*margin-top: 20px;*/
+    height: 100px;
+    position: relative;
+    width: 100%;
+    clear: both;
+}
+
+
+/* /adaptado do site trasnparencia.gov */
+
+
+
+
+#title{
+  text-align: center;
+  vertical-align: top; 
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 30px;
+  font-weight: bold;
+  color: #006AB6;
+}
+#admin{
+  text-align: right;
+  vertical-align: top; 
+}
+
+#head{
+	margin: 0 auto;
+	width: 980px;
+	text-align: right;
+}
+.array-field {
+  border: 2px solid #474747;
+  background: #FFE9D8;
+  padding: 5px;
+  margin: 5px;
+}
+
+.array-field-list li {
+  list-style: circle;
+  margin-left: 20px;
+}
+
+.parsed_query_header {
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 10pt;
+  font-weight: bold;
+}
+
+.parsed_query {
+  font-family: Courier, Courier New, monospaced;
+  font-size: 10pt;
+  font-weight: normal;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10pt;
+}
+
+a {
+  color: #006AB6;
+}
+
+.navigators {
+    background-color: #f7f7f7;
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    float: left;
+    margin: 36px 5px 5px 10px;
+    padding: 13px 8px;
+    position: relative;
+    width: 268px;
+}
+
+
+.tabs-bar {
+	background-color: #ececec;
+	border: 0 solid;
+	padding: 20px 15px 5px;
+}
+.tab {
+	display: inline-block;
+	font-weight: bold;
+	padding: 8px 16px;
+	margin: 0px 5px;
+	border-radius: 4px;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 14px;
+	background: #fff;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+	transition: all 0.3s;
+}
+
+.tab:hover {
+	transform: translateY(-1px);
+	box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+.tab a:hover {
+  color: #666;
+}
+.tab.selected {
+  background-color: #cecece;
+
+}
+
+
+.navigators h2 {
+    border-bottom: 1px solid #ccc;
+    color: #006ab6;
+    font-size: 14px;
+    margin: 5px -6px;
+    padding: 10px 5px 2px;
+    text-transform: uppercase;
+}
+.navigators h2:first-child {
+  margin-top: 0px;
+  padding-top: 0;
+}
+
+.navigators ul, .navigators ol {
+  list-style: none;
+  margin: 0;
+  margin-bottom: 5px;
+  margin-top: 5px;
+  padding-left: 10px;
+}
+
+.navigators li {
+	color: #606060;
+	padding: 2px 0;
+	font-size: 12px;  
+}
+
+
+
+.facet-field {
+  font-weight: bold;
+}
+
+.highlight {
+  color: white;
+  background-color: gray;
+  border: 1px black solid;
+}
+
+.highlight-box {
+  margin-left: 15px;
+}
+
+.field-name {
+  font-weight: bold;
+}
+
+.highlighted-facet-field {
+  background: white;
+}
+
+.constraints {
+  margin-top: 10px;
+}
+
+#query-form{
+    margin: 0 auto;
+    width: 90%;
+}
+#query-form .ac_input{
+	vertical-align: middle;
+}
+
+#query-form input[type="submit"], #query-form input[type="reset"], #query-form input[type="button"]{
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 5px;
+	vertical-align: middle;
+}
+#query-form input[type="submit"], #query-form input[type="button"]{
+    color: #fff;
+    background-color: #666;
+    border: 4px solid #a0a0a0;
+}
+#query-form input[type="submit"]:hover, #query-form input[type="button"]:hover{
+    background-color: #4A4A4A;
+}
+#query-form input[type="reset"]{
+    background-color: #ccc;
+    border: 4px solid #a0a0a0;
+    color: #505050;
+    font-weight: normal;
+}
+#query-form input[type="reset"]:hover{
+    background-color: #E9E9E9;
+}
+
+
+.constraints {
+  padding: 5px;
+  margin: 5px 0 10px;
+  font-weight: normal;
+  font-size: 24px;
+  letter-spacing: 0.08em;
+}
+
+.query-box {
+  padding: 25px 5px 5px;
+  margin: 0 0 15px;
+  font-weight: normal;
+  font-size: 21px;
+  letter-spacing: 0.08em;
+  background-color: #cecece;
+}
+
+.query-box #q {
+  margin-left: 8px;
+  width: 60%;
+  height: 38px;
+  border: 2px solid #ddd;
+  font-size: 1em;
+  padding: 0 16px;
+  border-radius: 8px;
+  transition: all 0.3s;
+}
+
+.query-box #q:focus {
+  outline: none;
+  border-color: #1351B4;
+  box-shadow: 0 0 0 3px rgba(0,113,182,0.1);
+}
+
+.query-box {
+  
+}
+
+.query-boost {
+    font-size: 12px;
+    padding-left: 86px;
+    paddi	
+}
+
+
+
+
+
+.constraints {
+  padding: 5px;
+  margin: 5px 0 10px;
+  font-weight: normal;
+  font-size: 24px;
+  letter-spacing: 0.08em;
+}
+
+.query-box {
+  padding: 25px 5px 5px;
+  margin: 0 0 15px;
+  font-weight: normal;
+  font-size: 21px;
+  letter-spacing: 0.08em;
+  background-color: #cecece;
+}
+
+.query-box #q {
+  margin-left: 8px;
+  width: 60%;
+  height: 38px;
+  border: 2px solid #ddd;
+  font-size: 1em;
+  padding: 0 16px;
+  border-radius: 8px;
+  transition: all 0.3s;
+}
+
+.query-box #q:focus {
+  outline: none;
+  border-color: #1351B4;
+  box-shadow: 0 0 0 3px rgba(0,113,182,0.1);
+}
+
+.query-box {
+  
+}
+
+.query-boost {
+    font-size: 12px;
+    padding-left: 86px;
+    padding-top: 4px;
+}
+
+.query-box .inputs{
+  /*left: 180px;
+  position: relative;*/
+  
+}
+
+#logo-topo-right {
+  float: right;
+  width: 50px;
+  margin: 0px 0px 20px 12px;
+  border-style: none;
+}
+
+#logo-left {
+    height: 30px;
+    margin: 5px 30px ;
+}
+
+#logo-right {
+	/*float: right;*/
+	height: 30px;
+	margin: 5px 0;
+}
+
+.pagination {
+  margin: 5px;
+  margin-left: 310px;
+  padding: 5px;
+  text-align: right;
+}
+.pagination span:first-child {
+    color: #006ab6;
+    float: left;
+    font-weight: bold;
+}
+.pagination .results-found {
+    font-size: 16px;
+	line-height: 16px;
+	padding-right: 5px;
+}
+.pagination a {
+    background-color: #666;
+    border-radius: 3px;
+    color: #fff;
+    display: inline-block;
+    margin: 0 2px;
+    padding: 3px 6px;
+    text-decoration: none;
+}
+.pagination a:hover {
+    background-color: #4A4A4A;
+}
+
+
+
+.result-document {
+	border: 1px solid #9f9f9f;
+    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.65);
+    margin: 5px 5px 20px 310px;
+    padding: 15px;
+	background-color: #e7e7e7;
+}
+/*
+.result-document:nth-child(2n+1) {
+	background-color: #454545;
+}
+*/
+
+.result-document div {
+    color: #404040;
+    font-size: 12px;
+    line-height: 16px;
+    padding: 2px 0 1px;
+}
+.result-document div strong {
+    color: #000;
+}
+
+
+.result-document div.result-title {
+    background-color: #fff;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.2);
+    color: #000;
+    margin: -15px -15px 4px;
+    padding: 10px 15px 7px;
+	line-height: 17px;
+}
+
+.result-body{
+  background: #ddd;
+}
+
+.mlt{
+	margin: 0 0 0 10px;
+}
+
+.map{
+  float: right;
+  position: relative;
+  top: 0px;  
+}
+
+
+
+.selected-facet-field {
+  font-weight: bold;
+}
+
+li.show {
+  list-style: disc;
+}
+
+.group-value{
+  font-weight: bold;
+}
+
+.error {
+  color: white;
+  background-color: red;
+  left: 210px;
+  width:80%;
+  position: relative;
+
+}
+
+#footer {
+	background-color: #CECECE;
+	padding: 0 0 5px;
+}
+#footer div {
+	margin: 9px 15px 5px;
+}
+#footer a {
+    background-color: #666;
+    border-radius: 3px;
+    color: #fff;
+    display: inline-block;
+    margin: 0 2px;
+    padding: 3px 6px;
+    text-decoration: none;
+}
+#footer a:hover {
+    background-color: 4A4A4A;
+}
+
+/* ========================================
+   MELHORIAS DO SISTEMA DE BUSCA
+   ======================================== */
+
+/* Search Container Melhorado */
+.search-container {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    margin-bottom: 20px;
+}
+
+.search-input-wrapper {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    position: relative;
+}
+
+.search-input-wrapper label {
+    font-weight: bold;
+    color: #1351B4;
+    font-size: 16px;
+    min-width: 60px;
+}
+
+/* Botão de Limpar Busca Principal */
+/* Input Group - Container para input + botão limpar */
+.input-group {
+    position: relative;
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+/* Input dentro do grupo ocupa toda largura */
+.input-group input {
+    width: 100% !important;
+    padding-right: 40px !important; /* Espaço para o botão × */
+    margin: 0 !important;
+}
+
+/* Botão de Limpar Busca Principal - DENTRO do input */
+.clear-input-btn {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: #999;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 20px;
+    line-height: 1;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    z-index: 10;
+}
+
+.clear-input-btn:hover {
+    background: #f0f0f0;
+    color: #666;
+    transform: translateY(-50%) scale(1.1);
+}
+
+/* Mostrar botão quando input tem valor */
+.input-group:has(input:not(:placeholder-shown)) .clear-input-btn,
+.input-group.has-value .clear-input-btn {
+    display: flex;
+}
+
+/* Botões do Formulário */
+.btn {
+    padding: 8px 24px;
+    border: none;
+    border-radius: 50px;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s;
+    background:white
+}
+
+.btn-primary {
+    background: #1351B4;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #0C326F;
+   
+}
+
+.btn-secondary {
+    border: 2px solid #1351B4;
+    background: white;
+    color: #1351B4;
+}
+
+.btn-secondary:hover {
+    background: #efefef;
+}
+
+.btn-filters {
+    background: white;
+    color: #1351B4;
+    border: 2px solid #1351B4;
+    padding: 8px 16px!important;
+}
+
+.btn-filters:hover {
+    background: #1351B4;
+    color: white;
+    i{
+        color: white;
+    }
+}
+
+/* Dialog Overlay e Box */
+.dialog-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 9998;
+    animation: fadeIn 0.3s;
+}
+
+.dialog-overlay.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dialog-box {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    z-index: 9999;
+    max-width: 1200px;
+    max-height: 85vh;
+    width: 95%;
+    overflow: hidden;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+}
+
+.dialog-box.active {
+    display: flex;
+    flex-direction: column;
+    opacity: 1;
+    visibility: visible;
+}
+
+.dialog-header {
+    background: #1351B4 ;
+    color: white;
+    padding: 10px 10px 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dialog-header h2 {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 0;
+}
+
+.dialog-close {
+    background: rgba(255,255,255,0);
+    border: none;
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 20px;
+    transition: all 0.3s;
+}
+
+.dialog-close:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+.dialog-body {
+    padding: 16px;
+    overflow-y: auto;
+}
+
+.dialog-footer {
+    padding: 8px;
+    background: #fff;
+    border-top: 1px solid #e0e0e0;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+/* Seções de Filtros */
+.filter-section {
+    margin-bottom: 30px;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+}
+
+.filter-section:last-child {
+    margin-bottom: 0;
+}
+
+.filter-section h3 {
+    color: #1351B4;
+    font-size: 16px;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #1351B4;
+}
+
+/* Form Grid */
+.form-grid-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.form-grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #333;
+    font-size: 13px;
+}
+
+/* Field Group */
+.field-group {
+    display: flex;
+    gap: 8px;
+    align-items: stretch;
+}
+
+.field-group input[type="text"] {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: all 0.3s;
+}
+
+.field-group input[type="text"]:focus {
+    outline: none;
+    border-color: #1351B4;
+    box-shadow: 0 0 0 3px rgba(0,113,182,0.1);
+}
+
+/* Inputs gerais */
+.form-group input[type="text"]:not(.field-group input) {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: all 0.3s;
+}
+
+.form-group input[type="text"]:not(.field-group input):focus {
+    outline: none;
+    border-color: #1351B4;
+    box-shadow: 0 0 0 3px rgba(0,113,182,0.1);
+}
+
+/* Toggle Switch - 3 Modos */
+.toggle-switch {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+    color: #333;
+    border-radius: 6px;
+    padding: 0 12px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    height: 38px;
+    box-sizing: border-box;
+    user-select: none;
+    white-space: nowrap;
+}
+
+.toggle-switch:hover {
+    background-color: #f1f1f1;
+    border-color: #bbb;
+}
+
+.toggle-switch .toggle-icon {
+    font-size: 1rem;
+    line-height: 1;
+}
+
+/* Estado: Não Contém (Excluir) */
+.toggle-switch.exclude {
+    background-color: #ffe6e6;
+    border-color: #e57373;
+    color: #b71c1c;
+}
+
+.toggle-switch.exclude:hover {
+    background-color: #ffd6d6;
+    border-color: #ef5350;
+}
+
+/* Estado: Igual (Exato) */
+.toggle-switch.exact {
+    background-color: #e3f2fd;
+    border-color: #2570E8;
+    color: #1351B4;
+}
+
+.toggle-switch.exact:hover {
+    background-color: #bbdefb;
+    border-color: #1351B4;
+}
+
+.toggle-text {
+    font-size: 0.875rem;
+    line-height: 1;
+}
+
+/* Badge Autocomplete */
+.field-wrapper {
+    position: relative;
+    margin-bottom: 8px;
+}
+
+.autocomplete-badge {
+    /* position: absolute;
+    top: -20px;
+    left: 0; */
+    background: #999;
+    color: white;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(230, 187, 187, 0.2);
+    z-index: 5;
+    text-transform: uppercase;
+    width:fit-content;
+}
+
+/* Campos de Data Otimizados */
+.date-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-direction: column;
+}
+
+.date-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+}
+
+.date-row label {
+    font-weight: bold;
+    font-size: 12px;
+    color: #666;
+    min-width: 30px;
+}
+
+.date-row input[type="date"] {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: all 0.3s;
+}
+
+.date-row input[type="date"]:focus {
+    outline: none;
+    border-color: #1351B4;
+    box-shadow: 0 0 0 3px rgba(0,113,182,0.1);
+}
+
+/* Valor Range */
+.valor-range {
+    grid-column: span 2;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    background-color: #e8e8e8;
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px solid #d0d0d0;
+}
+
+/* Results Info */
+.results-info {
+    background: white;
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+.results-count {
+    color: #1351B4;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+/* Responsividade */
+@media (max-width: 1024px) {
+    .form-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .form-grid,
+    .form-grid-2 {
+        grid-template-columns: 1fr;
+    }
+    
+    .dialog-box {
+        width: 100%;
+        height: 100%;
+        max-height: 100vh;
+        border-radius: 0;
+    }
+    
+    .date-group {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .valor-range {
+        grid-column: span 1;
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Melhorias no autocomplete (jQuery UI) */
+.ui-autocomplete {
+    max-height: 200px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 10000 !important;
+    border: 1px solid #1351B4 !important;
+    border-radius: 6px !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+}
+
+.ui-menu-item {
+    padding: 8px 12px !important;
+    font-size: 13px !important;
+    cursor: pointer !important;
+}
+
+.ui-menu-item:hover,
+.ui-menu-item.ui-state-focus {
+    background-color: #e3f2fd !important;
+    border: none !important;
+    color: #1565c0 !important;
+}
+
+/* Scrollbar customizada para dialog */
+.dialog-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+.dialog-body::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.dialog-body::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.dialog-body::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Botão de Maximizar/Minimizar */
+.dialog-maximize {
+    background: rgba(255,255,255,0);
+    border: none;
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 8px;
+}
+
+.dialog-maximize:hover {
+    background: rgba(255,255,255,0.2);
+    transform: scale(1.1);
+}
+
+/* Estado maximizado do dialog */
+.dialog-box.maximized {
+    max-width: 98vw !important;
+    max-height: 95vh !important;
+    width: 98vw !important;
+    height: 95vh !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    transition: all 0.3s ease;
+}
+
+/* Ajustar header quando maximizado */
+.dialog-box.maximized .dialog-header {
+    border-radius: 12px 12px 0 0;
+}
+
+/* Container dos botões de controle do dialog */
+.dialog-controls {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+i { 
+    color: #1351B4;
+}
+</style>
+<div class="query-box" style="background:#fff;">
+    <form id="query-form" action="#{url_for_home}" method="GET">
+        <div class="search-container" style="background:#efefef;border:1px solid #ddd;">
+            <div class="search-input-wrapper" >
+                <label for="q" #annTitle("...")>Busca:</label>
+                <div class="input-group">
+                <input type="text" id="q" name="q" value="$!esc.html($params.get('q'))" placeholder="Digite sua busca..." autocomplete="off" onKeyUp="loadValues(this)">
+                <button type="button" class="clear-input-btn" onclick="clearMainSearch()" title="Limpar busca">×</button>
+                </div>
+                
+                
+                <button type="button" class="btn btn-filters" onclick="openDialog()">
+                    <i class="fas fa-search"></i> Filtros Avançados
+                </button>
+                <button type="submit" id="querySubmit" class="btn btn-primary" onclick="checkQueryEmpty();">
+                    Buscar
+                </button>
+            </div>
+            <input type="hidden" name="status" id="status" value="$!esc.html($params.get('status'))">
+        </div>
+</div>
+
+
+
+<script>
+
+if(typeof String.prototype.trim !== 'function') {
+    String.prototype.trim = function() {
+        return this.replace(/^\s+|\s+$/g, '');
+    }
+}
+
+function openDialog() {
+    document.getElementById('dialogOverlay').classList.add('active');
+    document.getElementById('dialogBox').classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeDialog(event) {
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+    document.getElementById('dialogOverlay').classList.remove('active');
+    document.getElementById('dialogBox').classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+function toggleMaximize(event) {
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+    
+    var dialogBox = document.getElementById('dialogBox');
+    var icon = document.getElementById('maximizeIcon');
+    
+    if (dialogBox.classList.contains('maximized')) {
+        // Restaurar tamanho normal
+        dialogBox.classList.remove('maximized');
+        icon.textContent = '⛶';
+        icon.parentElement.title = 'Maximizar';
+    } else {
+        // Maximizar
+        dialogBox.classList.add('maximized');
+        icon.textContent = '⛶';
+        icon.parentElement.title = 'Restaurar';
+    }
+}
+
+// Atalho F11 para maximizar/minimizar (apenas quando dialog estiver aberto)
+document.addEventListener('keydown', function(e) {
+    var dialogBox = document.getElementById('dialogBox');
+    if (e.key === 'F11' && dialogBox.classList.contains('active')) {
+        e.preventDefault();
+        toggleMaximize();
+    }
+});
+
+function toggleMode(element) {
+    var currentMode = element.dataset.mode || 'contains';
+    var icon = element.querySelector('.toggle-icon');
+    var text = element.querySelector('.toggle-text');
+    
+    element.classList.remove('exclude', 'exact');
+    
+    if (currentMode === 'contains') {
+        element.dataset.mode = 'excludes';
+        element.classList.add('exclude');
+        icon.textContent = '✗';
+        text.textContent = 'Não Contém';
+    } else if (currentMode === 'excludes') {
+        element.dataset.mode = 'exact';
+        element.classList.add('exact');
+        icon.textContent = '=';
+        text.textContent = 'Igual';
+    } else {
+        element.dataset.mode = 'contains';
+        icon.textContent = '✓';
+        text.textContent = 'Contém';
+    }
+}
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeDialog(event);
+});
+
+document.getElementById('q').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('query-form').submit();
+    }
+});
+
+function clearMainSearch() {
+    var qEl = document.getElementById('q');
+    qEl.value = '';
+    qEl.focus();
+    updateClearButton();
+}
+
+function updateClearButton() {
+    var qEl = document.getElementById('q');
+    var inputGroup = qEl.closest('.input-group');
+    if (qEl.value.trim()) {
+        inputGroup.classList.add('has-value');
+    } else {
+        inputGroup.classList.remove('has-value');
+    }
+}
+
+// Adicionar listener para atualizar botão de limpar
+document.addEventListener('DOMContentLoaded', function() {
+    var qInput = document.getElementById('q');
+    if (qInput) {
+        qInput.addEventListener('input', updateClearButton);
+        updateClearButton(); // Verificar estado inicial
+    }
+});
+
+function escapeSolr(value) {
+    if(value.includes('nome_unidade_atual_s') || value.includes('unidade_origem_s')) {
+        value = value.replace(/[-[\]{}()*+?.,\\^$|#]/g, '\\$&');
+        return value.replace(/ /g, '\\ *');
+    } else {
+        return value.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+    }
+}
+
+function getDateValue(prefix, type) {
+    var dateInput = document.getElementById(prefix + '_' + type);
+    if (!dateInput || !dateInput.value) return '';
+    return dateInput.value + 'T' + (type === 'from' ? '00:00:00Z' : '23:59:59Z');
+}
+
+function buildDateRange(prefix, label, today) {
+    var from = getDateValue(prefix, 'from');
+    var to = getDateValue(prefix, 'to') || today + 'T23:59:59Z';
+    if (from === null) {
+        alert(label + ' Inicial inválida!');
+        return 'errorDate';
+    }
+    if (to === null) {
+        alert(label + ' Final inválida!');
+        return 'errorDate';
+    }
+    return from && to ? prefix + ':[' + from + ' TO ' + to + '] ' : '';
+}
+
+function applyFilters() {
+    var searchValue = '';
+    var today = new Date().toISOString().slice(0, 10);
+    var result;
+
+    // Datas
+    result = buildDateRange('dt_protocolo_tdt', 'Data Protocolo', today);
+    if(result == 'errorDate') {
+        return;
+    } else {
+        searchValue += result;
+    }
+
+    result = buildDateRange('dt_juntada_tdt', 'Data Juntada', today);
+    if(result == 'errorDate') {
+        return;
+    } else {
+        searchValue += result;
+    }
+
+    result = buildDateRange('dt_registro_tdt', 'Data Registro', today);
+    if(result == 'errorDate') {
+        return;
+    } else {
+        searchValue += result;
+    }
+
+    result = buildDateRange('dt_anexacao_tdt', 'Data Anexação', today);
+    if(result == 'errorDate') {
+        return;
+    } else {
+        searchValue += result;
+    }
+
+    // Valor Processo
+    var valorFrom = document.getElementById('valor_processo_d_from').value || '*';
+    var valorTo = document.getElementById('valor_processo_d_to').value || '*';
+    if (valorFrom !== '*' || valorTo !== '*') {
+        searchValue += 'valor_processo_d:[' + valorFrom + ' TO ' + valorTo + '] ';
+    }
+
+    // Campos de texto
+    var textFields = [
+        'grupo_processo_s', 'tipo_processo_s', 'subtipo_processo_s', 'processo_s',
+        'situacao_s', 'assuntos_objetos_s', 'tipo_documento_s', 'titulo_s',
+        'numero_doc_principal_exp_s', 'tributo_act_s', 'unidade_origem_s',
+        'equipe_origem_s', 'nome_unidade_atual_s', 'nome_equipe_atual_s',
+        'ni_contribuinte_s', 'nome_contribuinte_s', 'cpf_responsavel_s',
+        'nome_usuario_juntada_doc_s', 'nome_relator_drj_s', 'aleg_recurso_contrib_txt',
+        'result_questdrj_nivel1_s', 'result_questdrj_nivel2_s'
+    ];
+
+    for (var i = 0; i < textFields.length; i++) {
+        var fieldId = textFields[i];
+        var element = document.getElementById(fieldId);
+        if (!element || !element.value.trim()) continue;
+
+        var fieldValue = escapeSolr(element.value.trim());
+        var fieldGroup = element.closest('.field-group');
+        var toggleSwitch = fieldGroup ? fieldGroup.querySelector('.toggle-switch') : null;
+        var mode = toggleSwitch ? (toggleSwitch.dataset.mode || 'contains') : 'contains';
+
+        if (mode === 'excludes') {
+            searchValue += '-' + fieldId + ':*' + fieldValue + '* ';
+        } else if (mode === 'exact') {
+            searchValue += fieldId + ':"' + fieldValue + '" ';
+        } else {
+            searchValue += fieldId + ':*' + fieldValue + '* ';
+        }
+    }
+
+    if (searchValue) {
+        var qEl = document.getElementById('q');
+        var currentQuery = qEl.value.trim();
+        qEl.value = currentQuery ? currentQuery + ' ' + searchValue : searchValue;
+    }
+
+    closeDialog();
+    document.getElementById('querySubmit').click();
+}
+
+function clearFilters() {
+    // Limpar inputs de texto
+    var textInputs = document.querySelectorAll('.dialog-box input[type="text"]');
+    for (var i = 0; i < textInputs.length; i++) {
+        textInputs[i].value = '';
+    }
+    
+    // Limpar inputs de data
+    var dateInputs = document.querySelectorAll('.dialog-box input[type="date"]');
+    for (var i = 0; i < dateInputs.length; i++) {
+        dateInputs[i].value = '';
+    }
+    
+    // Resetar todos os toggle switches para "Contém"
+    var toggles = document.querySelectorAll('.toggle-switch');
+    for (var i = 0; i < toggles.length; i++) {
+        var toggle = toggles[i];
+        var currentMode = toggle.dataset.mode;
+        if (currentMode !== 'contains') {
+            toggle.classList.remove('exclude', 'exact');
+            toggle.dataset.mode = 'contains';
+            var icon = toggle.querySelector('.toggle-icon');
+            var text = toggle.querySelector('.toggle-text');
+            icon.textContent = '✓';
+            text.textContent = 'Contém';
+        }
+    }
+}
+
+function checkQueryEmpty() {
+    var qEl = document.getElementById('q');
+    if (!qEl.value.trim()) qEl.value = '*:*';
+}
+
+function loadValues(input) {
+    var xhr = new XMLHttpRequest();
+    var autoCompleteList = new Array();
+    var campo = input.name;
+
+    if(campo == 'q'){
+        console.log("https://eprocesso-buscador.receita.fazenda/solr/eprocesso/terms?limit=20&terms.prefix="+input.value+"&terms.sort=count&omitHeader=true&terms.fl=conteudo_txt");
+        xhr.open("GET", "https://eprocesso-buscador.receita.fazenda/solr/eprocesso/terms?limit=20&terms.prefix="+input.value+"&terms.sort=count&omitHeader=true&terms.fl=conteudo_txt", true);
+        campo = 'conteudo_txt';
+    } else {
+        console.log("https://eprocesso-buscador.receita.fazenda/solr/eprocesso/terms?limit=20&terms.prefix="+input.value+"&terms.sort=count&omitHeader=true&terms.fl="+input.name);
+        xhr.open("GET", "https://eprocesso-buscador.receita.fazenda/solr/eprocesso/terms?limit=20&terms.prefix="+input.value+"&terms.sort=count&omitHeader=true&terms.fl="+input.name, true);
+    }
+
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            console.log(xhr.responseText);
+            var myArr = JSON.parse(this.responseText);
+            for(i = 0; i < myArr["terms"][campo].length; i=i+2) {
+                autoCompleteList.push(myArr["terms"][campo][i])
+            }
+            console.log(autoCompleteList);
+        }
+    };
+    xhr.send();
+    $("#"+input.name).autocomplete({
+        source: autoCompleteList
+    });
+
+    var elementsWithIdPrefix = $("[id^='ui-id-']");
+    elementsWithIdPrefix.css('z-index', 9999);
+}
+</script>
+
+
+    #if($request.params.get('debugQuery'))
+      <input type="hidden" name="debugQuery" value="true"/>
+    #end
+    #if($annotate == true)
+      <input type="hidden" name="annotateBrowse" value="true"/>
+    #end
+    #foreach($fq in $request.params.getParams('fq'))
+      #if ($fq != "{!bbox}")
+        <input type="hidden" name="fq" id="allFQs" value="$esc.html($fq)"/>
+      #end
+    #end
+
+    <div class="constraints" #annTitle("Lista de filtros ativos. Clique para remover.")>
+      #foreach($fq in $params.getParams('fq'))
+        #set($previous_fq_count=$velocityCount - 1)
+        #if($fq != '')
+          &gt;
+          <a style="{text-decoration: line-through;}"
+            href="#url_for_filters($request.params.getParams('fq').subList(0,$previous_fq_count))"
+          >$fq</a>
+        #end
+      #end
+    </div>
+
+    #parse("query_debug.vm")
+
+    #set($queryOpts = $request.params.get("queryOpts"))
+    #if($queryOpts && $queryOpts != "")
+      <input type="hidden" name="queryOpts" value="$queryOpts"/>
+    #end
+
+        <div class="dialog-overlay" id="dialogOverlay" onclick="closeDialog(event)"></div>
+
+<div class="dialog-box" id="dialogBox">
+    <div class="dialog-header">
+    <h2>🔍 Filtros Avançados de Busca</h2>
+        <div class="dialog-controls">
+            <button type="button" class="dialog-maximize" onclick="toggleMaximize(event)" title="Maximizar/Restaurar">
+                <span id="maximizeIcon">⛶</span>
+            </button>
+            <button type="button" class="dialog-close" onclick="closeDialog(event)" title="Fechar">×</button>
+        </div>
+    </div>
+
+    <div class="dialog-body">
+        <!-- Filtros de Data -->
+        <div class="filter-section">
+            <h3><i class="fas fa-calendar"></i> Filtros de Data</h3>
+            <div class="form-grid form-grid-4">
+                <div class="form-group">
+                    <label>Data do Protocolo</label>
+                    <div class="date-group">
+                        <div class="date-row">
+                            <label>De:</label>
+                            <input type="date" id="dt_protocolo_tdt_from" name="dt_protocolo_tdt_from" value="$!esc.html($params.get('dt_protocolo_tdt_from'))">
+                        </div>
+                        <div class="date-row">
+                            <label>Até:</label>
+                            <input type="date" id="dt_protocolo_tdt_to" name="dt_protocolo_tdt_to" value="$!esc.html($params.get('dt_protocolo_tdt_to'))">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Data da Juntada</label>
+                    <div class="date-group">
+                        <div class="date-row">
+                            <label>De:</label>
+                            <input type="date" id="dt_juntada_tdt_from" name="dt_juntada_tdt_from" value="$!esc.html($params.get('dt_juntada_tdt_from'))">
+                        </div>
+                        <div class="date-row">
+                            <label>Até:</label>
+                            <input type="date" id="dt_juntada_tdt_to" name="dt_juntada_tdt_to" value="$!esc.html($params.get('dt_juntada_tdt_to'))">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Data de Registro</label>
+                    <div class="date-group">
+                        <div class="date-row">
+                            <label>De:</label>
+                            <input type="date" id="dt_registro_tdt_from" name="dt_registro_tdt_from" value="$!esc.html($params.get('dt_registro_tdt_from'))">
+                        </div>
+                        <div class="date-row">
+                            <label>Até:</label>
+                            <input type="date" id="dt_registro_tdt_to" name="dt_registro_tdt_to" value="$!esc.html($params.get('dt_registro_tdt_to'))">
+                        </div>
+                    </div>
+                </div>
+
+               <div class="form-group">
+                    <label>Data de Anexação</label>
+                    <div class="date-group">
+                        <div class="date-row">
+                            <label>De:</label>
+                            <input type="date" id="dt_anexacao_tdt_from" name="dt_anexacao_tdt_from" value="$!esc.html($params.get('dt_anexacao_tdt_from'))">
+                        </div>
+                        <div class="date-row">
+                            <label>Até:</label>
+                            <input type="date" id="dt_anexacao_tdt_to" name="dt_anexacao_tdt_to" value="$!esc.html($params.get('dt_anexacao_tdt_to'))">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Processo e Documento -->
+        <div class="filter-section">
+            <h3><i class="fas fa-file"></i> Processo e Documento</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <div class="field-wrapper">
+                        <span class="autocomplete-badge">AUTO</span>
+                        <label>Grupo Processo</label>
+                    </div>    
+                    <div class="field-group">
+                        <input type="text" id="grupo_processo_s" name="grupo_processo_s" placeholder="Grupo Processo" value="$!esc.html($params.get('grupo_processo_s'))" onKeyUp="loadValues(this)" autocomplete="off" class="ac_input">
+                        <div class="toggle-switch" data-mode="contains" onclick="toggleMode(this)">
+                            <span class="toggle-icon">✓</span>
+                            <span class="toggle-text">Contém</span>
+                        </div>
+                    </div> 
+                </div>
+                <div class="form-group">
+                    
+                    <div class="field-wrapper">
+                        <span class="autocomplete-badge">AUTO</span>
+                        <label>Tipo Processo</label>
+                        </div>
+                        <div class="field-group">
+                            <input type="text" id="tipo_processo_s" name="tipo_processo_s" placeholder="Tipo Processo" value="$!esc.html($params.get('tipo_processo_s'))" onKeyUp="loadValues(this)" autocomplete="off" class="ac_input">
+                            <div class="toggle-switch" data-mode="contains" onclick="toggleMode(this)">
+                                <span class="toggle-icon">✓</span>
+                                <span class="toggle-text">Contém</span>
+                            </div>
+                        </div>
+                    
+                </div>
+                <div class="form-group">
+                    
+                    <div class="field-wrapper">
+                        <span class="autocomplete-badge">AUTO</span>
+                        <label>Subtipo Processo</label>
+                        </div>
+                        <div class="field-group">
+                            <input type="text" id="subtipo_processo_s" name="subtipo_processo_s" placeholder="Subtipo Processo" value="$!esc.html($params.get('subtipo_processo_s'))" onKeyUp="loadValues(this)" autocomplete="off" class="ac_input">
+                            <div class="toggle-switch" data-mode="contains" onclick="toggleMode(this)">
+                                <span class="toggle-icon">✓</span>
+                                <span class="toggle-text">Contém</span>
+                            </div>
+                        </div>
+                    
+                </div>
+                <div class="form-group">
+                    <label>Nr Processo</label>
+                    <div class="field-group">
+                        <input type="text" id="processo_s" name="processo_s" placeholder="Nr Processo" value="$!esc.html($params.get('processo_s'))">
+                        <div class="toggle-switch" data-mode="contains" onclick="toggleMode(this)">
+                            <span class="toggle-icon">✓</span>
+                            <span class="toggle-text">Contém</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    
+                    <div class="field-wrapper">
+                        <span class="autocomplete-badge">AUTO</span>
+                        <label>Situação Processo</label>
+                        </div>
+                        <div class="field-group">
+                            <input type="text" id="situacao_s" name="situacao_s" placeholder="Situação Processo" value="$!esc.html($params.get('situacao_s'))" onKeyUp="loadValues(this)" autocomplete="off" class="ac_input">
+                            <div class="toggle-switch" data-mode="contains" onclick="toggleMode(this)">
+                                <span class="toggle-icon">✓</span>
+                                <span class="toggle-text">Contém</span>
+                            </div>
+                        </div>
+                    
+                </div>
+                <div class="form-group">
+                    <label>Assuntos/Objetos</label>
+                    <div class="field-group">
+                        <input type="text" id="assuntos_objetos_s" name="assuntos_objetos_s" placeholder="Assuntos/Objetos" value="$!esc.html($params.get('assuntos_objetos_s'))">
+                        <div class="toggle-switch" data-mode="contains" onclick="toggleMode(this)">
+                            <span class="toggle-icon">✓</span>
+                            <span class="toggle-text">Contém</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    
+                    <div class="field-wrapper">
+                        <span class="autocomplete-badge">AUTO</span>
+                        <label>Tipo do Documento</label>
+                        </div>
+                        <div class="field-group">
+                            <input type="text" id="tipo_documento_s" name="tipo_documento_s" placeholder="Tipo do Documento" value="$!esc.html($params.get('tipo_documento_s'))" onKeyUp="loadValues(this)" autocomplete="off" class="ac_input">
+                            <div class="toggle-switch" data-mode="contains" onclick="toggleMode(this)">
+                                <span class="toggle-icon">✓</span>
+                                <span class="toggle-text">Contém</span>
+                            </div>
+                        </div>
+                    
+                </div>
+                <div class="form-group">
+                    <label>Título Documento</label>
+                    <div class="field-group">
+                        <input type="text" id="titulo_s" name="titulo_s" placeholder="Título Documento" value="$!esc.html($params.get('titulo_s'))">
+                        <div class="toggle-switch" data-mode="contains" onclick="toggleMode(this)">
+                            <span class="toggle-icon">✓</span>
+                            <span class="toggle-text">Contém</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Nr Doc Principal</label>
+                    <div class="field-group">
+                        <input type="text" id="numero_doc_principal_exp_s" name="numero_doc_principal_exp_s" placeholder="Nr Doc Principal" value="$!esc.html($params.get('numero_doc_principal_exp_s'))">
+                        <div class="toggle-switch" data-mode="contains" onclick="toggleMode(this)">
+                            <span class="toggle-icon">✓</span>
+                            <span class="toggle-text">Contém</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    
+                    <div class="field-wrapper">
+                        <span class="autocomplete-badge">AUTO</span>
+                        <label>Tributo ACT</label>
+                        </div>
+                        <div class="field-group">
+                            <input type="text" id="tributo_act_s" name="tributo_act_s" placeholder="Tributo ACT" value="$!esc.html($params.get('tributo_act_s'))" onKeyUp="loadValues(this)" autocomplete="off" class="ac_input">
+                            <div class="toggle-switch" data-mode="contains" onclick="toggleMode(this)">
+                                <span class="toggle-icon">✓</span>
+                                <span class="toggle-text">Contém</span>
+                            </div>
+                        </div>
+                    
+                </div>
+
+                <div class="valor-range">
+                    <div class="form-group">
+                        <label>Valor Mínimo</label>
+                        <input type="text" id="valor_processo_d_from" name="valor_processo_d_from" placeholder="0.00" value="$!esc.html($params.get('valor_processo_d_from'))">
+                    </div>
+                    <div class="form-group">
+                        <label>Valor Máximo</label>
+                        <input type="text" id="valor_processo_d_to" name="valor_processo_d_to" placeholder="0.00" value="$!esc.html($params.get('valor_processo_d_to'))">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Unidade e Equipe -->
+        <div class="filter-section">
+            <h3><i class="fas fa-people-group"></i> Unidade e Equipe</h3>
+            <div class="form-grid form-grid-2">
+                <div class="form-group">
+                    
+                    <div class="field-wrapper">
+                        <span class="autocomplete-badge">AUTO</span>
+                        <label>Unidade Origem</label>
+                        </div>
+                        <div class="field-group">
+                            <input type="text" id="unidade_origem_s" name="unidade_origem_s" placeholder="Unidade Origem" value="$!esc.html($params.get('unidade_origem_s'))" onKeyUp="loadValues(this)" autocomplete="off" class="ac_input">
+                            <div class="toggle-switch" data-mode="contains" onclick="toggleMode(this)">
+                                <span class="toggle-icon">✓</span>
+                                <span class="toggle-text">Contém</span>
+                            </div>
+                        
+                    </div>
+                </div>
+                <div class="form-group">
+                    
+                    <div class="field-wrapper">
+                        <span class="autocomplete-badge">AUTO</span>
+                        <label>Equipe Origem</label>
+                        </div>
+                        <div class="field-group">
+                            <input type="text" id="equipe_origem_s" name="equipe_origem_s" placeholder="Equipe Origem" value="$!esc.html($params.get('equipe_origem_s'))" onKeyUp="loadValues(this)" autocomplete="off" class="ac_input">
+                            <div class="toggle-switch" data-mode="contains" onclick="toggleMode(this)">
+                                <span class="toggle-icon">✓</span>
+                                <span class="toggle-text">Contém</span>
+                            </div>
+                        </div>
+                    
+                </div>
+                <div class="form-group">
+                    
+                    <div class="field-wrapper">
+                        <span class="autocomplete-badge">AUTO</span>
+                        <label>Unidade Atual</label>
+                        </div>
+                        <div class="field-group">
+                            <input type="text" id="nome_unidade_atual_s" name="nome_unidade_atual_s" placeholder="Unidade Atual" value="$!esc.html($params.get('nome_unidade_atual_s'))" onKeyUp="loadValues(this)" autocomplete="off" class="ac_input">
+                            <div class="toggle-switch" data-mode="contains" onclick="toggleMode(this)">
+                                <span class="toggle-icon">✓</span>
+                                <span class="toggle-text">Contém</span>
+                            </div>
+                        </div>
+                    
+                </div>
+                <div class="form-group">
+                    
+                    <div class="field-wrapper">
+                        <span class="autocomplete-badge">AUTO</span>
+                        <label>Equipe Atual</label>
+                        </div>
+                        <div class="field-group">
+                            <input type="text" id="nome_equipe_atual_s" name="nome_equipe_atual_s" placeholder="Equipe Atual" value="$!esc.html($params.get('nome_equipe_atual_s'))" onKeyUp="loadValues(this)" autocomplete="off" class="ac_input">
+                            <div class="toggle-switch" data-mode="contains" onclick="toggleMode(this)">
+                                <span class="toggle-icon">✓</span>
+                                <span class="toggle-text">Contém</span>
+                            </div>
+                        </div>
+                    </div>
+                
+            </div>
+        </div>
+
+        <!-- Partes Envolvidas -->
+        <div class="filter-section">
+            <h3><i class="fas fa-user"></i> Partes Envolvidas</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>NI Contribuinte</label>
+                    <div class="field-group">
+                        <input type="text" id="ni_contribuinte_s" name="ni_contribuinte_s" placeholder="NI Contribuinte" value="$!esc.html($params.get('ni_contribuinte_s'))">
+                        <div class="toggle-switch" data-mode="contains" onclick="toggleMode(this)">
+    <span class="toggle-icon">✓</span>
+    <span class="toggle-text">Contém</span>
+</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Nome do Contribuinte</label>
+                    <div class="field-group">
+                        <input type="text" id="nome_contribuinte_s" name="nome_contribuinte_s" placeholder="Nome do Contribuinte" value="$!esc.html($params.get('nome_contribuinte_s'))">
+                        <div class="toggle-switch" data-mode="contains" onclick="toggleMode(this)">
+    <span class="toggle-icon">✓</span>
+    <span class="toggle-text">Contém</span>
+</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>CPF Responsável</label>
+                    <div class="field-group">
+                        <input type="text" id="cpf_responsavel_s" name="cpf_responsavel_s" placeholder="CPF Responsável" value="$!esc.html($params.get('cpf_responsavel_s'))">
+                        <div class="toggle-switch" data-mode="contains" onclick="toggleMode(this)">
+    <span class="toggle-icon">✓</span>
+    <span class="toggle-text">Contém</span>
+</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Nome Usuário Juntada</label>
+                    <div class="field-group">
+                        <input type="text" id="nome_usuario_juntada_doc_s" name="nome_usuario_juntada_doc_s" placeholder="Nome Usuário Juntada" value="$!esc.html($params.get('nome_usuario_juntada_doc_s'))">
+                        <div class="toggle-switch" data-mode="contains" onclick="toggleMode(this)">
+    <span class="toggle-icon">✓</span>
+    <span class="toggle-text">Contém</span>
+</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Nome Relator DRJ</label>
+                    <div class="field-group">
+                        <input type="text" id="nome_relator_drj_s" name="nome_relator_drj_s" placeholder="Nome Relator DRJ" value="$!esc.html($params.get('nome_relator_drj_s'))">
+                        <div class="toggle-switch" data-mode="contains" onclick="toggleMode(this)">
+    <span class="toggle-icon">✓</span>
+    <span class="toggle-text">Contém</span>
+</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Julgamento -->
+        <div class="filter-section">
+            <h3><i class="fas fa-scale-balanced"></i> Julgamento</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    
+                    <div class="field-wrapper">
+                        <span class="autocomplete-badge">AUTO</span>
+                        <label>Alegações no Recurso</label>
+                        </div>
+                        <div class="field-group">
+                            <input type="text" id="aleg_recurso_contrib_txt" name="aleg_recurso_contrib_txt" placeholder="Alegações no Recurso" value="$!esc.html($params.get('aleg_recurso_contrib_txt'))" onKeyUp="loadValues(this)" autocomplete="off" class="ac_input">
+                            <div class="toggle-switch" data-mode="contains" onclick="toggleMode(this)">
+                                <span class="toggle-icon">✓</span>
+                                <span class="toggle-text">Contém</span>
+                            </div>
+                        </div>
+                    
+                </div>
+                <div class="form-group">
+                    
+                    <div class="field-wrapper">
+                        <span class="autocomplete-badge">AUTO</span>
+                        <label>Result Julgamento DRJ nível 1</label>
+                        </div>
+                        <div class="field-group">
+                            <input type="text" id="result_questdrj_nivel1_s" name="result_questdrj_nivel1_s" placeholder="Result Julgamento DRJ nível 1" value="$!esc.html($params.get('result_questdrj_nivel1_s'))" onKeyUp="loadValues(this)" autocomplete="off" class="ac_input">
+                            <div class="toggle-switch" data-mode="contains" onclick="toggleMode(this)">
+                                <span class="toggle-icon">✓</span>
+                                <span class="toggle-text">Contém</span>
+                            </div>
+                        </div>
+                    
+                </div>
+                <div class="form-group">
+                    <label>Result Julgamento DRJ nível 2</label>
+                    <div class="field-group">
+                        <input type="text" id="result_questdrj_nivel2_s" name="result_questdrj_nivel2_s" placeholder="Result Julgamento DRJ nível 2" value="$!esc.html($params.get('result_questdrj_nivel2_s'))" autocomplete="off" class="ac_input">
+                        <div class="toggle-switch" data-mode="contains" onclick="toggleMode(this)">
+                            <span class="toggle-icon">✓</span>
+                            <span class="toggle-text">Contém</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dialog-footer">
+        <button type="button" class="btn" onclick="window.open('../../help.html', '_blank', 'width=500px,height=660px,scrollbars=1');">
+            <i class="fas fa-info-circle"></i>
+        </button>
+        <button type="button" class="btn btn-secondary" onclick="clearFilters()">
+            Limpar Filtros
+        </button>
+        
+        <button type="button" class="btn btn-primary" onclick="applyFilters()">
+            Aplicar Filtros
+        </button>
+    </div>
+</div>
+  </form>
+</div>

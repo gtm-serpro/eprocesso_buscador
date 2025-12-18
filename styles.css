@@ -403,6 +403,9 @@ aside {
     text-decoration: none;
     color: var(--primary-dark);
     transition: var(--transition);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .facet-link:hover {
@@ -1106,22 +1109,16 @@ footer {
     text-align: center;
     padding: 4rem 2rem;
     color: var(--gray-800);
+    font-size:1pt;
+    font-weight:500;
 }
 
-/* .spinner {
-    border: 3px solid var(--gray-200);
-    border-top: 3px solid var(--primary);
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    animation: spin 1s linear infinite;
-    margin: 0 auto 1rem;
-} */
 /* HTML: <div class="loader"></div> */
 .spinner {
-  width: 15px;
+  width: 10px;
   aspect-ratio: 1;
   position: relative;
+  margin: 0 auto .5rem;
 }
 .spinner::before,
 .spinner::after {
@@ -1129,13 +1126,14 @@ footer {
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  background: #000;
+  background: var(--primary);
 }
 .spinner::before {
-  box-shadow: -26px 0;
+  box-shadow: -16px 0 var(--warning-dark);
   animation: l10-1 1.5s infinite linear;
 }
 .spinner::after {
+  background: var(--primary-dark);
   transform: rotate(0deg) translateX(26px);
   animation: l10-2 1.5s infinite linear;
 }

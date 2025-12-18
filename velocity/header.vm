@@ -1,0 +1,10 @@
+#**
+ *  Render the top section of the page visible to users
+ *#
+<div id="top3" style="height: 84px;background-image:url('/img/4fbae8678490deba79866a4ec705b22c.png');background-repeat: no-repeat;background-position:center center;background-size:cover;border-top: 3px solid #0071BC;box-sizing:content-box;text-align:right;overflow: hidden;">
+  <img id="logo-eprocesso" src="/img/logo-eprocesso2.png" style="float: left;margin: 8px 8px 8px 20px;max-height: 78px;">
+  <img id="logo-receita" src="/img/logo-rfb2.png" style="margin-right: 10px;max-height: 78px;vertical-align: middle;margin-top: -22px;text-align: right;">
+  <img id="logo-pgfn" src="/img/logo-pgfn2.png" style="margin-right: 10px;max-height: 78px;vertical-align: middle;margin-top: -22px;text-align: right;">
+  <img id="logo-carf" src="/img/logo-carf2.png" style="max-height: 78px;vertical-align: middle;margin-top: -22px;text-align: right;">
+  <img id="logo-icone" src="/img/icone-eprocesso2.png" style="margin-top: 22px;max-height: 78px;vertical-align: middle;text-align: right;">	  
+</div>

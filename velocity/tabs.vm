@@ -1,0 +1,129 @@
+#**
+ *  Provides navigation/access to Advanced search options
+ *  Usually displayed near the top of the page
+ *#
+
+##TODO: Make some nice tabs here
+
+#set($queryOpts = $params.get("queryOpts"))
+
+<div class="tabs-bar" #annTitle("Clique para escolher o sistema onde se deseja buscar/analisar os dados")>
+
+  <span>Sistemas:</span>
+
+  ##queryOpts=$queryOpts
+
+  ## return to Simple Search
+  ##set( $selected = ($queryOpts && $queryOpts != "") )
+  #set( $selected = (! $queryOpts) || $queryOpts == "demo" )
+  <span class="tab #if($selected)selected#end" #annTitle("Compradores, materiais e compras do governo")>
+    #if($selected)
+      e-Processo
+    #else
+      <a href="#url_root/eproc/browse?#debug#annotate&queryOpts=eproc_db">
+        EPROC_DB</a>
+    #end
+  </span>
+#*
+  #set( $selected = ($queryOpts == "siasg") )
+  <span class="tab #if($selected)selected#end" #annTitle("Fornecedores, compradores e compras brutas do SIASG do governo")>
+    #if($selected)
+      Compras Governamentais<img src="/compras/img/locker.png">
+    #else
+      <a href="#url_root/siasg2/browse?#debug#annotate&queryOpts=siasg">
+        Compras Governamentais<img src="/compras/img/locker.png"></a>
+    #end
+  </span>
+
+  #set( $selected = ($queryOpts == "avlicitacao") )
+  <span class="tab #if($selected)selected#end" #annTitle("Avisos de Licita&ccedil;&atilde;o oriundos do ComprasNet e atualizados atrav&eacute;s do Quartzo do SERPRO")>
+    #if($selected)
+      Avisos de Licita&ccedil;&atilde;o<img src="/compras/img/locker.png">
+    #else
+      <a href="#url_root/avlicit/browse?#debug#annotate&queryOpts=avlicitacao">
+      ##<a href="javascript:alert('Em desenvolvimento');">
+        Avisos de Licita&ccedil;&atilde;o<img src="/compras/img/locker.png"></a>
+    #end
+  </span>
+
+  #set( $selected = ($queryOpts == "avlicit_anexos") )
+  <span class="tab #if($selected)selected#end" #annTitle("Conte&uacute;do n&atilde;o estruturado: Anexos dos Avisos de Licita&ccedil;&atilde;o oriundos do file-system do ComprasNet")>
+    #if($selected)
+      Avisos de Licit. (anexos)<img src="/compras/img/locker.png">
+    #else
+      <a href="#url_root/avlicit_anexos/browse?#debug#annotate&queryOpts=avlicit_anexos">
+      ##<a href="javascript:alert('Em desenvolvimento');">
+        Avisos de Licit. (anexos)<img src="/compras/img/locker.png"></a>
+    #end
+  </span>
+
+  #set( $selected = ($queryOpts == "vipe") )
+  <span class="tab #if($selected)selected#end" #annTitle("Viabilidades e Perfis baseados nas estat&iacute;sticas dos dados do IRPF 2015")>
+    #if($selected)
+      VIPE<img src="/compras/img/locker.png">
+    #else
+      <a href="#url_root/vipe/browse?#debug#annotate&queryOpts=vipe">
+      ##<a href="javascript:alert('Em desenvolvimento');">
+        VIPE<img src="/compras/img/locker.png"></a>
+    #end
+  </span>
+
+## #*
+  #set( $selected = ($queryOpts == "sigepe") )
+  <span class="tab #if($selected)selected#end" #annTitle("Em desenvolvimento...")>
+    #if($selected)
+      <i>SIGEPE</i>
+    #else
+      ##<a href="#url_for_home?#debug#annotate&queryOpts=sigepe">
+      <a href="javascript:alert('Em desenvolvimento');">
+        <i>SIGEPE</i></a>
+    #end
+  </span>
+
+  #set( $selected = ($queryOpts == "siafi") )
+  <span class="tab #if($selected)selected#end" #annTitle("Em desenvolvimento...")>
+    #if($selected)
+      <i>SIAFI</i>
+    #else
+      ##<a href="#url_for_home?#debug#annotate&queryOpts=siafi">
+      <a href="javascript:alert('Em desenvolvimento');">
+        <i>SIAFI</i></a>
+    #end
+  </span>
+
+  #set( $selected = ($queryOpts == "outros") )
+  <span class="tab #if($selected)selected#end" #annTitle("Em desenvolvimento...")>
+    #if($selected)
+      ...
+    #else
+      ##<a href="#url_for_home?#debug#annotate&queryOpts=outros">
+      <a href="javascript:alert('Em desenvolvimento');">
+        ...</a>
+    #end
+  </span>
+
+  #set( $selected = ($queryOpts == "cruzamentos") )
+  <span class="tab #if($selected)selected#end" #annTitle("Em desenvolvimento...")>
+    #if($selected)
+      <i>Cruzamentos entre os Sistemas</i>
+    #else
+      ##<a href="#url_for_home?#debug#annotate&queryOpts=cruzamentos">
+      <a href="javascript:alert('Em desenvolvimento');">
+        <i>Cruzamentos entre os Sistemas</i></a>
+    #end
+  </span>
+  *#
+
+  <span title="Responsáveis pelas coleções e seus dados." style="display:none;">
+          <a href="http://189.9.150.183/crud" target="_blank">
+            <b> Curadores </b></a>
+      </span>
+ 
+ <span>&nbsp; &nbsp; &nbsp; </span>
+
+  <!-- span title="Lago de Dados Governamental.">
+          <a href="https://189.9.163.12/" target="_blank">
+		<b> Lago de Dados - HUE </b><img src="/compras/img/locker.png"></a>
+      </span -->
+
+</div>

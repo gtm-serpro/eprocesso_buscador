@@ -1,0 +1,40 @@
+#**
+ *  Render the bottom section of the page visible to users
+ *#
+#set ($startPage = ($page.current_page_number - 1) * $page.results_per_page)
+
+<hr/>
+<div>
+  <span>Op&ccedil;&otilde;es:</span>
+
+  #if($request.params.get('debugQuery'))
+    <a href="#url_for_home?#q#if($request.params.getParams('fq')!=$null && $list!=$null && $fq!=$null && $list.size($request.params.getParams('fq')) > 0)&#fqs($request.params.getParams('fq'))#end" style="display:none">
+      desligar debug</a>
+  #else
+    <a href="#url_for_lens&debugQuery=true&fl=*,score" style="display:none">
+      ligar debug</a>
+  #end
+  
+  #if($annotate)
+    <a href="#url_for_home?#q#if($request.params.getParams('fq') != $null && $list != $null && $fq!=$null && $list.size($request.params.getParams('fq')) > 0)&#fqs($request.params.getParams('fq'))#end#boostPrice" style="display:none">
+      desligar ajuda</a>
+  #else
+    <a href="#url_for_lens&annotateBrowse=true" style="display:none">
+      ligar ajuda</a>
+  #end
+  
+  <a #annTitle("Clique para obter o resultado em XML. Acrescente &rows=100 na URL para obter 100 registros, por exemplo.") href="#url_for_lens&wt=xml&start=$startPage#if($request.params.get('debugQuery'))&debugQuery=true#end">
+    Resultados em XML</a>,
+  <a #annTitle("Clique para obter o resultado em JSON. Acrescente &rows=100 na URL para obter 100 registros, por exemplo.") href="#url_for_lens&wt=json&start=$startPage#if($request.params.get('debugQuery'))&debugQuery=true#end">
+    em JSON</a> e 
+  <a #annTitle("Clique para obter o resultado em CSV. Acrescente &rows=100 na URL para obter 100 registros, por exemplo.") href="#url_for_lens&wt=csv&start=$startPage#if($request.params.get('debugQuery'))&debugQuery=true#end">
+    em CSV</a>
+
+</div>
+
+<div style="display:none">
+  Aten&ccedil;&atilde;o: 
+  Este &eacute; um projeto piloto de desempenho de busca em grandes volumes de dados. Os dados aqui apresentados n&atilde;o devem ser utilizados para outros fins
+  fora deste projeto.
+</div>
+

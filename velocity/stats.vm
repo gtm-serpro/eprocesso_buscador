@@ -1,0 +1,32 @@
+#**
+ *  Display facets based on field values
+ *  e.g.: fields specified by &facet.field=
+ *#
+#if($response.response.stats.stats_fields)
+  <h2 #annTitle("Estat&iacute;sticas automaticamente geradas para os campos num&eacute;ricos respeitando os resultados da busca e filtros")>
+    Estat&iacute;sticas
+  </h2>
+
+#set ($labelsMap = {})
+#set ($labelsMap['total_valor_nota'] = 'Valor total da nota')
+#set ($labelsMap['total_valor_icms'] = 'Valor total do ICMS')
+#set ($labelsMap['total_valor_icms_desonerado'] = 'Valor total do ICMS desonerado')
+#set ($labelsMap['total_valor_ipi'] = 'Valor total do IPI')
+#set ($labelsMap['total_valor_pis'] = 'Valor total do PIS')
+#set ($labelsMap['total_valor_cofins'] = 'Valor total do COFINS')
+#set ($labelsMap['det_produto_valor_unitario_tfs'] = 'Valor unitário por produto')
+
+  #foreach($field in $response.response.stats.stats_fields)
+      #if($field.value && $field.value.size() > 0)
+          <span class="facet-field">#if($labelsMap.get($field.key)) $labelsMap.get($field.key) #else $field.key #end</span>
+          #set($stat=$field.value)
+          <ul>
+              <li><strong>M&iacute;nimo:</strong> $number.format('R$ #,##0.00',$stat.min)</li>
+              <li><strong>M&aacute;ximo:</strong> $number.format('R$ #,##0.00',$stat.max)</li>
+              <li><strong>Soma:</strong> $number.format('R$ #,##0.00',$stat.sum)</li>
+              <li><strong>M&eacute;dia:</strong> $number.format('R$ #,##0.00',$stat.mean)</li>
+              <li><strong>Desvio padr&atilde;o:</strong> $number.format('R$ #,##0.00',$stat.stddev)</li>
+          </ul>
+      #end
+  #end    ## end for each stat field
+#end      ## end if response has stat fields

@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>eProcesso Buscador - Demo Completa</title>
+    <style>
+      /* Loading/Empty States */
+        .loading-state, .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #6c757d;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #0066cc;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Copy Feedback */
+        .copy-feedback {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+
+        /* Demo Controls */
+        .demo-controls {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 999;
+        }
+
+        .demo-controls h3 {
+            margin-bottom: 0.75rem;
+            font-size: 0.875rem;
+            color: #212529;
+        }
+
+        .demo-controls button {
+            display: block;
+            width: 100%;
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            border: 1px solid #dee2e6;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+
+        .demo-controls button:hover {
+            background: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header>
+        <div class="header-content">
+            <div class="logo-container">
+                📄 eProcesso Buscador
+            </div>
+            <div class="search-bar">
+                <div class="search-input-container">
+                    <input type="text" class="search-input" id="q" name="q" 
+                           placeholder="Digite sua busca..." autocomplete="off">
+                    <button type="button" class="clear-input-btn" 
+                            onclick="clearMainSearch()" title="Limpar busca">×</button>
+                </div>
+                <button type="submit" class="btn btn-primary" onclick="checkQueryEmpty()">
+                    Buscar
+                </button>
+                <button class="btn btn-secondary btn-filter">
+                    🔧 Filtros
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN -->
+    <main>
+        <!-- SIDEBAR - Facetas -->
+        <aside>
+            <div class="faceted-search">
+                <div class="faceted-title">Busca Facetada</div>
+                <!-- Facetas serão inseridas aqui dinamicamente -->
+            </div>
+        </aside>
+
+        <!-- RESULTS -->
+        <section class="results-section">
+            <!-- Filtros Aplicados -->
+            <div class="applied-filters" id="appliedFilters" style="display: none;">
+                <div class="applied-filters-header">
+                    <span class="applied-filters-title">Filtros aplicados:</span>
+                    <button class="btn-clear-all" id="btnClearAllFilters">Limpar todos</button>
+                </div>
+                <div class="applied-filters-list" id="appliedFiltersList"></div>
+            </div>
+
+            <!-- Results Container -->
+            <div class="results-container" id="resultsContainer">
+                <div class="loading-state">
+                    <div class="spinner"></div>
+                    <p>Carregando resultados...</p>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer>
+                <div class="footer-left">
+                    <span><span class="results-found">0</span> resultados encontrados</span>
+                    <div class="export-buttons">
+                        <a href="#" class="export-btn" onclick="alert('Export XML'); return false;">XML</a>
+                        <a href="#" class="export-btn" onclick="alert('Export JSON'); return false;">JSON</a>
+                        <a href="#" class="export-btn" onclick="alert('Export CSV'); return false;">CSV</a>
+                    </div>
+                </div>
+                <div class="pagination">
+                    <button disabled>Anterior</button>
+                    <span>Página <span class="page-num">1</span> de <span class="page-count">1</span></span>
+                    <button>Próxima</button>
+                </div>
+            </footer>
+        </section>
+    </main>
+
+    <!-- DEMO CONTROLS -->
+    <div class="demo-controls">
+        <h3>🎮 Controles de Demo</h3>
+        <button onclick="mockComplete()">Carregar Tudo</button>
+        <button onclick="mockFacets()">Apenas Facetas</button>
+        <button onclick="mockCards(5)">Apenas Cards (5)</button>
+        <button onclick="mockSearch('IRPJ')">Buscar "IRPJ"</button>
+        <button onclick="mockPagination()">Simular Paginação</button>
+        <button onclick="downloadMockData()">Baixar JSON</button>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script>
+        // CONFIG
+        const CONFIG = {
+            SOLR_BASE_URL: 'https://eprocesso-buscador.receita.fazenda/solr/eprocesso',
+            AUTOCOMPLETE_LIMIT: 20,
+            COPY_FEEDBACK_DURATION: 3000,
+            OPERATORS: {
+                contem: 'Contém',
+                'nao-contem': 'Não Contém',
+                igual: 'Igual'
+            }
+        };
+
+        // UTILIDADES
+        const Utils = {
+            formatDate(isoDate) {
+                const [year, month, day] = isoDate.split('-');
+                return `${day}/${month}/${year}`;
+            },
+            escapeSolr(value) {
+                return value.replace(/([+\-&|!(){}[\]^"~*?:\\])/g, '\\$1');
+            },
+            truncate(text, maxLength = 50) {
+                return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+            },
+            getTodayISO() {
+                return new Date().toISOString().slice(0, 10);
+            },
+            debounce(func, wait) {
+                let timeout;
+                return function executedFunction(...args) {
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => func.apply(this, args), wait);
+                };
+            }
+        };
+
+        // CLIPBOARD
+        const Clipboard = {
+            async copy(text) {
+                try {
+                    await navigator.clipboard.writeText(text);
+                    this.showFeedback(text);
+                } catch (err) {
+                    this.fallbackCopy(text);
+                }
+            },
+            fallbackCopy(text) {
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                textarea.style.cssText = 'position:fixed;left:-9999px';
+                document.body.appendChild(textarea);
+                textarea.select();
+                try {
+                    document.execCommand('copy');
+                    this.showFeedback(text);
+                } catch (err) {
+                    console.error('Erro ao copiar:', err);
+                }
+                document.body.removeChild(textarea);
+            },
+            showFeedback(text) {
+                const existing = document.querySelector('.copy-feedback');
+                if (existing) existing.remove();
+                const feedback = document.createElement('div');
+                feedback.className = 'copy-feedback';
+                feedback.innerHTML = `✓ Copiado: <strong>${Utils.truncate(text)}</strong>`;
+                document.body.appendChild(feedback);
+                setTimeout(() => {
+                    feedback.style.animation = 'slideOut 0.3s ease-out';
+                    setTimeout(() => feedback.remove(), 300);
+                }, CONFIG.COPY_FEEDBACK_DURATION);
+            }
+        };
+
+        // SEARCH
+        const Search = {
+            clear() {
+                const input = document.querySelector('.search-input');
+                input.value = '';
+                input.focus();
+            },
+            submit() {
+                const input = document.querySelector('.search-input');
+                if (!input.value.trim()) {
+                    input.value = '*:*';
+                }
+            }
+        };
+
+        window.clearMainSearch = () => Search.clear();
+        window.checkQueryEmpty = () => Search.submit();
+    </script>
+
+    <!-- Incluir os scripts do sistema aqui -->
+    <!-- <script src="result-cards-manager.js"></script> -->
+    <!-- <script src="faceted-search-manager.js"></script> -->
+    <!-- <script src="mock-data-generator.js"></script> -->
+    
+    <script>
+        console.log('');
+        console.log('🎭 DEMO DO EPROCESSO BUSCADOR');
+        console.log('═══════════════════════════════════════');
+        console.log('');
+        console.log('📋 Use os botões no canto inferior esquerdo');
+        console.log('   ou digite os comandos no console:');
+        console.log('');
+        console.log('  mockComplete()        - Carrega tudo');
+        console.log('  mockFacets()          - Apenas facetas');
+        console.log('  mockCards(10)         - Apenas cards');
+        console.log('  mockSearch("query")   - Simula busca');
+        console.log('  mockPagination()      - Navega páginas');
+        console.log('  downloadMockData()    - Baixa JSON');
+        console.log('');
+        console.log('═══════════════════════════════════════');
+        console.log('');
+    </script>
+</body>
+</html>

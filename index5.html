@@ -1,0 +1,2165 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.cdnfonts.com/css/rawline" rel="stylesheet">
+    <title>e-Processo Buscador</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Rawline', sans-serif;
+            background-color: #f7f9fa;
+            color: #333;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Header */
+        header {
+            background-color: #edf5ff;
+            display: flex;
+            align-items: center;
+            border-bottom: 2px solid #1351B4;
+            padding: 8px 16px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .header-content {
+            display: flex;
+            width: 100%;
+            align-items: center;
+            /* gap: 16px; */
+        }
+
+        .logo-container {
+            width: 250px;
+            position: relative;
+        }
+
+        .logo-container img {
+            height: 36px;
+        }
+
+        .logo-badge {
+            color: #071d41;
+            position: absolute;
+            left: 87px;
+            top: 24px;
+            font-size: 9px;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+        }
+
+        .search-input {
+            height: 36px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            width: 100%;            
+            padding: 0 16px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #1351b4;
+            box-shadow: 0 0 0 3px rgba(19, 81, 180, 0.1);
+        }
+        .search-input-container{
+            position: relative;
+            max-width: 500px;
+            flex: 1;
+        }
+        .btn-primary {
+            height: 36px;
+            border-radius: 50px;
+            border: none;
+            padding: 0 24px;
+            background-color: #1351b4;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary:hover {
+            background-color: #0c3d8a;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(19, 81, 180, 0.3);
+        }
+
+        .btn-secondary {
+            height: 36px;
+            border-radius: 50px;
+            border: 2px solid #1351b4;
+            padding: 0 24px;
+            background-color: #fff;
+            color: #1351b4;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background-color: #edf5ff;
+            transform: translateY(-1px);
+        }
+
+        .institutions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin: 0 16px;
+        }
+
+        .institutions img {
+            height: 22px;
+            opacity: 0.9;
+            transition: opacity 0.2s;
+        }
+
+        .institutions img:hover {
+            opacity: 1;
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            display: flex;
+            min-height: 0;
+            border-bottom: 2px solid #1351b4;
+        }
+
+        /* Sidebar */
+        aside {
+            width: 250px;
+            background-color: #fff;
+            border-right: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .faceted-search {
+            padding: 12px 8px 16px 16px;
+            overflow-y: auto;
+            font-size: 12px;
+        }
+
+        .faceted-title {
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 16px;
+            color: #0C326F;
+        }
+
+        .facet-group {
+            margin-bottom: 8px;
+        }
+
+        .facet-label {
+            font-weight: 600;
+            margin-bottom: 2px;
+            color: #333;
+        }
+
+        .facet-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 2px 0;
+        }
+
+        .facet-link {
+            text-decoration: none;
+            color: #0C326F;
+            transition: color 0.2s;
+        }
+
+        .facet-link:hover {
+            color: #1351b4;
+            text-decoration: underline;
+        }
+
+        .facet-badge {
+            background-color: #f0f0f0;
+            color: #666;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 2px 8px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        /* Results Section */
+        .results-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 16px;
+        }
+
+        .results-container {
+            flex: 1;
+            overflow-y: auto;
+            /* padding: 16px; */
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .result-card {
+            background-color: #fff;
+            border: 1px solid #dfe1e2;
+            border-radius: 8px;
+            padding: 16px;
+            transition: all 0.2s;
+        }
+
+        .result-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #1351b4;
+            margin-bottom: 12px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .result-icon {
+            display: flex;
+            gap: 2px;
+        }
+
+        .icon-circle {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+        }
+
+        .icon-primary {
+            background-color: #1351b4;
+        }
+
+        .icon-secondary {
+            background-color: #0C326F;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 4px;
+        }
+
+        .result-field {
+            padding: 8px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            transition: all 0.2s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .result-field:hover {
+            background-color: #edf5ff;
+            box-shadow: 0 2px 4px rgba(19, 81, 180, 0.1);
+        }
+
+        .result-field:active {
+            transform: scale(0.98);
+        }
+
+        .copy-feedback {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #28a745;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            font-weight: 600;
+            font-size: 14px;
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal {
+            background-color: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 1600px;
+            max-height: 95vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .modal-header {
+            padding: 8px 16px;
+            border-bottom: 2px solid #1351b4;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0C326F;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: #666;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 40px;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+
+        .modal-body {
+            padding: 16px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .filter-section {
+            margin-bottom: 10px;
+        }
+
+        .filter-section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #0C326F;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #1351b4;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            column-gap: 12px;
+            row-gap:4px;
+        }
+
+        .filter-label-auto::after {
+            content: " (AUTO)";
+            font-size: 10px;
+            color: #666;
+            font-weight: 400;
+        }
+
+        .filter-input-wrapper {
+            display: flex;
+            align-items: center;
+        }
+
+        .operator-toggle {
+            position: relative;
+            height: 38px;
+            width: 90px;
+            flex-shrink: 0;
+            background-color: #fff;
+            border: 1px solid #1351b4;
+            border-radius: 0 40px 40px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .operator-toggle:hover {
+            background-color: #edf5ff;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(19, 81, 180, 0.2);
+        }
+
+        .operator-toggle:active {
+            transform: translateY(0);
+        }
+
+        .operator-current {
+            font-size: 12px;
+            font-weight: 600;
+            color: #1351b4;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .operator-toggle[data-operator="contem"] {
+            background-color: #edf5ff;
+            border-color: #1351b4;
+        }
+
+        .operator-toggle[data-operator="nao-contem"] {
+            background-color: #fff3e0;
+            border-color: #f57c00;
+        }
+
+        .operator-toggle[data-operator="nao-contem"] .operator-current {
+            color: #f57c00;
+        }
+
+        .operator-toggle[data-operator="igual"] {
+            background-color: #e8f5e9;
+            border-color: #2e7d32;
+        }
+
+        .operator-toggle[data-operator="igual"] .operator-current {
+            color: #2e7d32;
+        }
+
+
+        .filter-group {
+            /* margin-bottom: 8px; */
+            align-self: flex-end;
+        }
+
+        .field-label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+            font-size: 14px;
+        }
+
+        .filter-input,
+        .filter-select {
+            width: 100%;
+            height: 40px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 0 12px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .filter-input:focus,
+        .filter-select:focus {
+            outline: none;
+            border-color: #1351b4;
+            box-shadow: 0 0 0 3px rgba(19, 81, 180, 0.1);
+        }
+
+        .filter-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .modal-footer {
+            padding: 12px 16px;
+            border-top: 1px solid #ddd;
+            display: flex;
+            gap: 12px;
+            justify-content: space-between;
+        }
+
+        .btn-apply {
+            height: 40px;
+            border-radius: 50px;
+            border: none;
+            padding: 0 24px;
+            background-color: #1351b4;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-apply:hover {
+            background-color: #0c3d8a;
+            box-shadow: 0 2px 8px rgba(19, 81, 180, 0.3);
+        }
+
+        .btn-cancel {
+            height: 40px;
+            border-radius: 50px;
+            border: 2px solid #1351B4;
+            padding: 0 24px;
+            background-color: #fff;
+            color: #1351B4;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .date-range {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .date-range-label {
+            font-size: 12px;
+            color: #666;
+            font-weight: 600;
+            min-width: 16px;
+            text-align: end;
+        }
+
+        .date-input {
+            height: 38px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 0 12px;
+            font-size: 14px;
+            cursor: pointer;
+            width: 150px;
+            color: #666;            
+        }
+
+        .date-input:focus {
+            outline: none;
+            border-color: #1351b4;
+            box-shadow: 0 0 0 3px rgba(19, 81, 180, 0.1);
+        }
+
+        .dates-row{
+            display: flex;
+            gap:32px;
+            flex-wrap: wrap;
+        }
+
+        .btn-clear {
+            height: 40px;
+            border-radius: 50px;
+            border: 2px solid #dc3545;
+            padding: 0 24px;
+            background-color: #fff;
+            color: #dc3545;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-clear:hover {
+            background-color: #dc3545;
+            color: #fff;
+        }
+
+        .footer-right {
+            display: flex;
+            gap: 12px;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .field-label {
+            font-weight: 600;
+            color: #0C326F;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .field-value {
+            font-size: 13px;
+            color: #333;
+            word-break: break-word;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #edf5ff;
+            border-top: 2px solid #1351B4;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 12px;
+            margin:-16px;
+        }
+
+        .footer-left {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 4px;
+        }
+
+        .export-btn {
+            color: #1351b4;
+            background-color: #fff;
+            border: 1px solid #81aefc;
+            border-radius: 50px;
+            padding: 4px 12px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .export-btn:hover {
+            background-color: #1351b4;
+            color: #fff;
+        }
+
+        .pagination {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .pagination button {
+            height: 36px;
+            border-radius: 50px;
+            border: none;
+            padding: 0 24px;
+            background-color: #1351b4;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .pagination button:hover:not(:disabled) {
+            background-color: #0c3d8a;
+            transform: translateY(-1px);
+        }
+
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ccc;
+        }
+ 
+        /* Container dos filtros aplicados */
+.applied-filters {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.applied-filters-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    /* margin-bottom: 12px; */
+}
+
+.applied-filters-title {
+    font-weight: 600;
+    font-size: 14px;
+    color: #333;
+}
+
+.btn-clear-all {
+    background: transparent;
+    border: 1px solid #d32f2f;
+    color: #d32f2f;
+    padding: 6px 12px;
+    border-radius: 40px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.btn-clear-all:hover {
+    background: #d32f2f;
+    color: white;
+}
+
+/* Lista de filtros */
+.applied-filters-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* Container dos filtros aplicados */
+.applied-filters {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.applied-filters-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.applied-filters-title {
+    font-weight: 600;
+    font-size: 14px;
+    color: #333;
+}
+
+.btn-clear-all {
+    background: transparent;
+    border: 1px solid #d32f2f;
+    color: #d32f2f;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.btn-clear-all:hover {
+    background: #d32f2f;
+    color: white;
+}
+
+/* Lista de filtros */
+.applied-filters-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* Tag individual de filtro */
+.filter-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    transition: all 0.2s ease;
+    animation: slideInFilter 0.3s ease-out;
+}
+
+/* Cores por operador */
+.filter-tag[data-operador="contem"] {
+    background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+    box-shadow: 0 2px 6px rgba(33, 150, 243, 0.3);
+}
+
+.filter-tag[data-operador="contem"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
+}
+
+.filter-tag[data-operador="igual"] {
+    background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);
+    box-shadow: 0 2px 6px rgba(76, 175, 80, 0.3);
+}
+
+.filter-tag[data-operador="igual"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+}
+
+.filter-tag[data-operador="nao-contem"] {
+    background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+    box-shadow: 0 2px 6px rgba(255, 152, 0, 0.3);
+}
+
+.filter-tag[data-operador="nao-contem"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 152, 0, 0.4);
+}
+
+/* Para filtros sem operador (datas, valores) - mantém roxo */
+.filter-tag[data-operador="null"],
+.filter-tag:not([data-operador]) {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
+}
+
+.filter-tag[data-operador="null"]:hover,
+.filter-tag:not([data-operador]):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+@keyframes slideInFilter {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.filter-label {
+    font-weight: 600;
+}
+
+.filter-operator {
+    font-style: italic;
+    opacity: 0.9;
+    font-size: 12px;
+}
+
+.filter-value {
+    font-weight: 500;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    display: flex;
+    gap:8px;
+}
+
+.filter-remove {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 4px;
+    transition: all 0.2s ease;
+    font-weight: bold;
+}
+
+.filter-remove:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .applied-filters {
+        padding: 12px;
+    }
+    
+    .applied-filters-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .filter-tag {
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+}
+
+@keyframes slideInFilter {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.filter-label {
+    font-weight: 600;
+}
+
+.filter-operator {
+    font-style: italic;
+    opacity: 0.9;
+    font-size: 12px;
+}
+
+
+
+.filter-remove {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 4px;
+    transition: all 0.2s ease;
+    font-weight: bold;
+}
+
+.filter-remove:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .applied-filters {
+        padding: 12px;
+    }
+    
+    .applied-filters-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .filter-tag {
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+}
+.clear-input-btn {
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: #999;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 20px;
+    line-height: 1;
+    /* display: none; */
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    z-index: 10;
+}
+.clear-input-btn:hover {
+    background: #f0f0f0;
+    color: #666;
+    transform: translateY(-50%) scale(1.1);
+}
+.icon-filter{
+    width: 24px;
+    fill: #1351B4;
+}
+::-webkit-calendar-picker-indicator {
+  background-image: url('data:image/svg+xml;utf8,<svg fill="%231351B4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M216 64C229.3 64 240 74.7 240 88L240 128L400 128L400 88C400 74.7 410.7 64 424 64C437.3 64 448 74.7 448 88L448 128L480 128C515.3 128 544 156.7 544 192L544 480C544 515.3 515.3 544 480 544L160 544C124.7 544 96 515.3 96 480L96 192C96 156.7 124.7 128 160 128L192 128L192 88C192 74.7 202.7 64 216 64zM216 176L160 176C151.2 176 144 183.2 144 192L144 240L496 240L496 192C496 183.2 488.8 176 480 176L216 176zM144 288L144 480C144 488.8 151.2 496 160 496L480 496C488.8 496 496 488.8 496 480L496 288L144 288z"/></svg>');
+}
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo-container">
+                <img src="logo-eprocesso.png" alt="e-Processo">
+                <p class="logo-badge">BUSCADOR</p>
+            </div>
+
+            <div class="search-bar">
+                <div class="search-input-container">
+                    <input type="text" class="search-input" id="q" name="q" value="" placeholder="Digite sua busca..." autocomplete="off" onkeyup="loadValues(this)">
+                    <button type="button" class="clear-input-btn" onclick="clearMainSearch()" title="Limpar busca">×</button>
+                </div>
+                <button type="submit" id="querySubmit" class="btn btn-primary" onclick="checkQueryEmpty();">Buscar</button>
+                <button class="btn-secondary">Filtros Avançados</button>
+            </div>
+
+            <div class="institutions">
+                <img src="Receita.svg" alt="Receita Federal">
+                <img src="PGFN.svg" alt="PGFN">
+                <img src="CARF.svg" alt="CARF">
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <aside>
+            <div class="faceted-search">
+                <div class="faceted-title">Busca Facetada</div>
+
+                <div class="facet-group">
+                    <div class="facet-label">Grupo</div>
+                    <div class="facet-item">
+                        <a href="#" class="facet-link">Nome do Processo</a>
+                        <span class="facet-badge">123</span>
+                    </div>
+                    <div class="facet-item">
+                        <a href="#" class="facet-link">Tipo de Documento</a>
+                        <span class="facet-badge">45</span>
+                    </div>
+                    <div class="facet-item">
+                        <a href="#" class="facet-link">Unidade</a>
+                        <span class="facet-badge">78</span>
+                    </div>
+                </div>
+      
+            </div>
+        </aside>
+
+        <section class="results-section">
+             <div class="applied-filters" id="appliedFilters" style="display: none;">
+    <div class="applied-filters-header">
+        <span class="applied-filters-title">Filtros aplicados:</span>
+        <button class="btn-clear-all" id="btnClearAllFilters">Limpar todos</button>
+    </div>
+    <div class="applied-filters-list" id="appliedFiltersList">
+        <!-- Os filtros serão inseridos aqui dinamicamente -->
+    </div>
+</div>
+            <div class="results-container">
+                <div class="result-card">
+                    <div class="result-header">
+                        <div class="result-icon">
+                            <div class="icon-circle icon-primary"></div>
+                            <div class="icon-circle icon-secondary"></div>
+                        </div>
+                        <span>AUTO DE INFRAÇÃO - OUTROS - ANEXO IV - Contrato social e Alterações</span>
+                    </div>
+
+                    <div class="result-grid">
+                        <div class="result-field">
+                            <div class="field-label">Número do processo</div>
+                            <div class="field-value">11065720723201585</div>
+                        </div>
+                        <div class="result-field">
+                            <div class="field-label">Data anexação</div>
+                            <div class="field-value">16/04/2015 17:00</div>
+                        </div>
+                        <div class="result-field">
+                            <div class="field-label">Data protocolo</div>
+                            <div class="field-value">10/03/2015 03:00</div>
+                        </div>
+                        <div class="result-field">
+                            <div class="field-label">Data juntada</div>
+                            <div class="field-value">14/04/2015 13:31</div>
+                        </div>
+                        <div class="result-field">
+                            <div class="field-label">Unidade origem</div>
+                            <div class="field-value">RS SÃO SEBASTIÃO DO CAÍ ARF</div>
+                        </div>
+                        <div class="result-field">
+                            <div class="field-label">Equipe origem</div>
+                            <div class="field-value">FAZEND-GABIN-ARF-SSC-RS</div>
+                        </div>
+                        <div class="result-field">
+                            <div class="field-label">Tipo documento</div>
+                            <div class="field-value">IMPUGNAÇÃO</div>
+                        </div>
+                        <div class="result-field">
+                            <div class="field-label">Grupo processo</div>
+                            <div class="field-value">PROCESSO TRIBUTÁRIO</div>
+                        </div>
+                        <div class="result-field">
+                            <div class="field-label">Tipo processo</div>
+                            <div class="field-value">LANÇAMENTO</div>
+                        </div>
+                        <div class="result-field">
+                            <div class="field-label">Subtipo processo</div>
+                            <div class="field-value">AUTO DE INFRAÇÃO E/OU NOTIFICAÇÃO DE LANÇAMENTO(FISCEL)</div>
+                        </div>
+                        <div class="result-field">
+                            <div class="field-label">NI do Contribuinte</div>
+                            <div class="field-value">92315332000183</div>
+                        </div>
+                        <div class="result-field">
+                            <div class="field-label">Nome do Contribuinte</div>
+                            <div class="field-value">MK QUÍMICA DO BRASIL LTDA</div>
+                        </div>
+                        <div class="result-field">
+                            <div class="field-label">Nome Equipe Atual</div>
+                            <div class="field-value">ARQUIVO ÚNICO</div>
+                        </div>
+                        <div class="result-field">
+                            <div class="field-label">Nome Unidade Atual</div>
+                            <div class="field-value">ARQUIVO ÚNICO</div>
+                        </div>
+                        <div class="result-field">
+                            <div class="field-label">CPF Responsável</div>
+                            <div class="field-value">51734427272</div>
+                        </div>
+                        <div class="result-field">
+                            <div class="field-label">Nome usuário juntada</div>
+                            <div class="field-value">PRISCILLA FONSECA DA SILVA DE OLIVEIRA</div>
+                        </div>
+                        <div class="result-field">
+                            <div class="field-label">Tributo ACT</div>
+                            <div class="field-value">20 - IRPJ - Imposto sobre a Renda da Pessoa Jurídica</div>
+                        </div>
+                        <div class="result-field">
+                            <div class="field-label">Trecho</div>
+                            <div class="field-value">do lucro líquido de valores correspondentes à subvenções públicas
+                                recebidas do Estado do Mato Grosso</div>
+                        </div>
+                    </div>
+                </div>
+
+              
+            </div>
+
+            <footer>
+                <div class="footer-left">
+                    <span><span class="results-found">123</span> resultados encontrados em 9 ms.</span>
+                    <div class="export-buttons">
+                        <a href="/solr/eprocessospo_hml/browse?&q=&wt=xml&start=-10" class="export-btn">XML</a>
+                        <a href="/solr/eprocessospo_hml/browse?&q=&wt=json&start=-10" class="export-btn">JSON</a>
+                        <a href="/solr/eprocessospo_hml/browse?&q=&wt=csv&start=-10" class="export-btn">CSV</a>
+                    </div>
+                </div>
+
+                <div class="pagination">
+                    <button disabled>Anterior</button>
+                    <span>Página <span class="page-num">1</span> de <span class="page-count">10</span></span>
+                    <button>Próxima</button>
+                </div>
+            </footer>
+        </section>
+       
+
+    </main>
+
+    <!-- Modal de Filtros Avançados -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Filtros Avançados</h2>
+                <button class="modal-close" id="closeModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Filtros de Data -->
+                <div class="filter-section">
+                    <div class="filter-section-title">
+                        <svg class="icon-filter" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M224 64C241.7 64 256 78.3 256 96L256 128L384 128L384 96C384 78.3 398.3 64 416 64C433.7 64 448 78.3 448 96L448 128L480 128C515.3 128 544 156.7 544 192L544 480C544 515.3 515.3 544 480 544L160 544C124.7 544 96 515.3 96 480L96 192C96 156.7 124.7 128 160 128L192 128L192 96C192 78.3 206.3 64 224 64zM160 304L160 336C160 344.8 167.2 352 176 352L208 352C216.8 352 224 344.8 224 336L224 304C224 295.2 216.8 288 208 288L176 288C167.2 288 160 295.2 160 304zM288 304L288 336C288 344.8 295.2 352 304 352L336 352C344.8 352 352 344.8 352 336L352 304C352 295.2 344.8 288 336 288L304 288C295.2 288 288 295.2 288 304zM432 288C423.2 288 416 295.2 416 304L416 336C416 344.8 423.2 352 432 352L464 352C472.8 352 480 344.8 480 336L480 304C480 295.2 472.8 288 464 288L432 288zM160 432L160 464C160 472.8 167.2 480 176 480L208 480C216.8 480 224 472.8 224 464L224 432C224 423.2 216.8 416 208 416L176 416C167.2 416 160 423.2 160 432zM304 416C295.2 416 288 423.2 288 432L288 464C288 472.8 295.2 480 304 480L336 480C344.8 480 352 472.8 352 464L352 432C352 423.2 344.8 416 336 416L304 416zM416 432L416 464C416 472.8 423.2 480 432 480L464 480C472.8 480 480 472.8 480 464L480 432C480 423.2 472.8 416 464 416L432 416C423.2 416 416 423.2 416 432z"/></svg>
+                        Filtros de Data</div>
+
+                    <div class="dates-row">
+                        <div class="filter-group">
+                            <label class="field-label">Data do Protocolo do Processo</label>
+                            <div class="date-range">
+                                <span class="date-range-label">De</span>
+                                <input type="date" class="date-input">
+                                <span class="date-range-label">Até</span>
+                                <input type="date" class="date-input">
+                            </div>
+                        </div>
+
+                        <div class="filter-group">
+                            <label class="field-label">Data da Juntada</label>
+                            <div class="date-range">
+                                <span class="date-range-label">De</span>
+                                <input type="date" class="date-input">
+                                <span class="date-range-label">Até</span>
+                                <input type="date" class="date-input">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Processo e Documento -->
+                <div class="filter-section">
+                    <div class="filter-section-title">
+                        <svg class="icon-filter" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M128 128C128 92.7 156.7 64 192 64L341.5 64C358.5 64 374.8 70.7 386.8 82.7L493.3 189.3C505.3 201.3 512 217.6 512 234.6L512 512C512 547.3 483.3 576 448 576L192 576C156.7 576 128 547.3 128 512L128 128zM336 122.5L336 216C336 229.3 346.7 240 360 240L453.5 240L336 122.5zM248 320C234.7 320 224 330.7 224 344C224 357.3 234.7 368 248 368L392 368C405.3 368 416 357.3 416 344C416 330.7 405.3 320 392 320L248 320zM248 416C234.7 416 224 426.7 224 440C224 453.3 234.7 464 248 464L392 464C405.3 464 416 453.3 416 440C416 426.7 405.3 416 392 416L248 416z"/></svg>
+                        Processo e Documento</div>
+
+                    <div class="filters-grid">
+                        <div class="filter-group">
+                            <label class="field-label filter-label-auto">Grupo Processo</label>
+                            <div class="filter-input-wrapper">
+                                <input type="text" class="filter-input" placeholder="Digite...">
+                                <div class="operator-toggle" data-operator="contem">
+                                    <div class="operator-current">
+                                        <span class="operator-text">Contém</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="filter-group">
+                            <label class="field-label filter-label-auto">Tipo Processo</label>
+                            <div class="filter-input-wrapper">
+                                <input type="text" class="filter-input" placeholder="Digite...">
+                                <div class="operator-toggle" data-operator="contem">
+                                    <div class="operator-current">
+                                        <span class="operator-text">Contém</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="filter-group">
+                            <label class="field-label filter-label-auto">Subtipo Processo</label>
+                            <div class="filter-input-wrapper">
+                                <input type="text" class="filter-input" placeholder="Digite...">
+                                <div class="operator-toggle" data-operator="contem">
+                                    <div class="operator-current">
+                                        <span class="operator-text">Contém</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="filter-group">
+                            <label class="field-label">Nr Processo</label>
+                            <div class="filter-input-wrapper">
+                                <input type="text" class="filter-input" placeholder="Digite...">
+                                <div class="operator-toggle" data-operator="contem">
+                                    <div class="operator-current">
+                                        <span class="operator-text">Contém</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="filter-group">
+                            <label class="field-label filter-label-auto">Situação do Documento</label>
+                            <div class="filter-input-wrapper">
+                                <input type="text" class="filter-input" placeholder="Digite...">
+                                <div class="operator-toggle" data-operator="contem">
+                                    <div class="operator-current">
+                                        <span class="operator-text">Contém</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="filter-group">
+                            <label class="field-label">Assuntos/Objetos</label>
+                            <div class="filter-input-wrapper">
+                                <input type="text" class="filter-input" placeholder="Digite...">
+                                <div class="operator-toggle" data-operator="contem">
+                                    <div class="operator-current">
+                                        <span class="operator-text">Contém</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="filter-group">
+                            <label class="field-label filter-label-auto">Tipo do Documento</label>
+                            <div class="filter-input-wrapper">
+                                <input type="text" class="filter-input" placeholder="Digite...">
+                                <div class="operator-toggle" data-operator="contem">
+                                    <div class="operator-current">
+                                        <span class="operator-text">Contém</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="filter-group">
+                            <label class="field-label">Título Documento</label>
+                            <div class="filter-input-wrapper">
+                                <input type="text" class="filter-input" placeholder="Digite...">
+                                <div class="operator-toggle" data-operator="contem">
+                                    <div class="operator-current">
+                                        <span class="operator-text">Contém</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="filter-group">
+                            <label class="field-label">Nr Doc Principal</label>
+                            <div class="filter-input-wrapper">
+                                <input type="text" class="filter-input" placeholder="Digite...">
+                                <div class="operator-toggle" data-operator="contem">
+                                    <div class="operator-current">
+                                        <span class="operator-text">Contém</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="filter-group">
+                            <label class="field-label filter-label-auto">Tributo ACT</label>
+                            <div class="filter-input-wrapper">
+                                <input type="text" class="filter-input" placeholder="Digite...">
+                                <div class="operator-toggle" data-operator="contem">
+                                    <div class="operator-current">
+                                        <span class="operator-text">Contém</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="filter-value">
+                            <div class="">
+                                <label class="field-label">Valor Mínimo</label>
+                                <input type="number" class="filter-input" placeholder="R$ 0,00">
+                            </div>
+
+                            <div class="">
+                                <label class="field-label">Valor Máximo</label>
+                                <input type="number" class="filter-input" placeholder="R$ 0,00">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Unidade e Equipe -->
+                <div class="filter-section">
+                    <div class="filter-section-title">
+                        <svg class="icon-filter" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M64 128C64 92.7 92.7 64 128 64L384 64C419.3 64 448 92.7 448 128L448 249.3C401.1 268.3 368 314.3 368 368C368 395.7 376.8 421.4 391.8 442.4C340.3 463.4 304 514 304 573.1C304 574.1 304 575 304 576L128 576C92.7 576 64 547.3 64 512L64 128zM208 464L208 528L261.4 528C268.6 498.6 282.7 471.9 301.8 449.7C295.7 430.2 277.5 416 256 416C229.5 416 208 437.5 208 464zM339 288.3C338 288.1 337 288 336 288L304 288C295.2 288 288 295.2 288 304L288 336C288 344.8 295.2 352 304 352L320.7 352C322.8 329.2 329.1 307.7 339 288.3zM176 160C167.2 160 160 167.2 160 176L160 208C160 216.8 167.2 224 176 224L208 224C216.8 224 224 216.8 224 208L224 176C224 167.2 216.8 160 208 160L176 160zM288 176L288 208C288 216.8 295.2 224 304 224L336 224C344.8 224 352 216.8 352 208L352 176C352 167.2 344.8 160 336 160L304 160C295.2 160 288 167.2 288 176zM176 288C167.2 288 160 295.2 160 304L160 336C160 344.8 167.2 352 176 352L208 352C216.8 352 224 344.8 224 336L224 304C224 295.2 216.8 288 208 288L176 288zM416 368C416 323.8 451.8 288 496 288C540.2 288 576 323.8 576 368C576 412.2 540.2 448 496 448C451.8 448 416 412.2 416 368zM352 576C352 523 395 480 448 480L544 480C597 480 640 523 640 576C640 593.7 625.7 608 608 608L384 608C366.3 608 352 593.7 352 576z"/></svg>
+                        Unidade e Equipe</div>
+
+                    <div class="filters-grid">
+                        <div class="filter-group">
+                            <label class="field-label filter-label-auto">Unidade de Origem do Documento</label>
+                            <div class="filter-input-wrapper">
+                                <input type="text" class="filter-input" placeholder="Digite...">
+                                <div class="operator-toggle" data-operator="contem">
+                                    <div class="operator-current">
+                                        <span class="operator-text">Contém</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="filter-group">
+                            <label class="field-label filter-label-auto">Equipe de Origem do Documento</label>
+                            <div class="filter-input-wrapper">
+                                <input type="text" class="filter-input" placeholder="Digite...">
+                                <div class="operator-toggle" data-operator="contem">
+                                    <div class="operator-current">
+                                        <span class="operator-text">Contém</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="filter-group">
+                            <label class="field-label filter-label-auto">Unidade Atual</label>
+                            <div class="filter-input-wrapper">
+                                <input type="text" class="filter-input" placeholder="Digite...">
+                                <div class="operator-toggle" data-operator="contem">
+                                    <div class="operator-current">
+                                        <span class="operator-text">Contém</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="filter-group">
+                            <label class="field-label filter-label-auto">Equipe Atual</label>
+                            <div class="filter-input-wrapper">
+                                <input type="text" class="filter-input" placeholder="Digite...">
+                                <div class="operator-toggle" data-operator="contem">
+                                    <div class="operator-current">
+                                        <span class="operator-text">Contém</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Partes Envolvidas -->
+                <div class="filter-section">
+                    <div class="filter-section-title">
+                        <svg class="icon-filter" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M96 192C96 130.1 146.1 80 208 80C269.9 80 320 130.1 320 192C320 253.9 269.9 304 208 304C146.1 304 96 253.9 96 192zM32 528C32 430.8 110.8 352 208 352C305.2 352 384 430.8 384 528L384 534C384 557.2 365.2 576 342 576L74 576C50.8 576 32 557.2 32 534L32 528zM464 128C517 128 560 171 560 224C560 277 517 320 464 320C411 320 368 277 368 224C368 171 411 128 464 128zM464 368C543.5 368 608 432.5 608 512L608 534.4C608 557.4 589.4 576 566.4 576L421.6 576C428.2 563.5 432 549.2 432 534L432 528C432 476.5 414.6 429.1 385.5 391.3C408.1 376.6 435.1 368 464 368z"/></svg>
+                        Partes Envolvidas</div>
+
+                    <div class="filters-grid">
+                        <div class="filter-group">
+                            <label class="field-label">NI Contribuinte</label>
+                            <div class="filter-input-wrapper">
+                                <input type="text" class="filter-input" placeholder="Digite...">
+                                <div class="operator-toggle" data-operator="contem">
+                                    <div class="operator-current">
+                                        <span class="operator-text">Contém</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="filter-group">
+                            <label class="field-label">Nome do Contribuinte</label>
+                            <div class="filter-input-wrapper">
+                                <input type="text" class="filter-input" placeholder="Digite...">
+                                <div class="operator-toggle" data-operator="contem">
+                                    <div class="operator-current">
+                                        <span class="operator-text">Contém</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="filter-group">
+                            <label class="field-label">CPF Responsável</label>
+                            <div class="filter-input-wrapper">
+                                <input type="text" class="filter-input" placeholder="Digite...">
+                                <div class="operator-toggle" data-operator="contem">
+                                    <div class="operator-current">
+                                        <span class="operator-text">Contém</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="filter-group">
+                            <label class="field-label">Nome Usuário Juntada</label>
+                            <div class="filter-input-wrapper">
+                                <input type="text" class="filter-input" placeholder="Digite...">
+                                <div class="operator-toggle" data-operator="contem">
+                                    <div class="operator-current">
+                                        <span class="operator-text">Contém</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="filter-group">
+                            <label class="field-label">Nome Relator DRJ</label>
+                            <div class="filter-input-wrapper">
+                                <input type="text" class="filter-input" placeholder="Digite...">
+                                <div class="operator-toggle" data-operator="contem">
+                                    <div class="operator-current">
+                                        <span class="operator-text">Contém</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Julgamento -->
+                <div class="filter-section">
+                    <div class="filter-section-title">
+                        <svg class="icon-filter" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.--><path d="M384 96L512 96C529.7 96 544 110.3 544 128C544 145.7 529.7 160 512 160L398.4 160C393.2 185.8 375.5 207.1 352 217.3L352 512L512 512C529.7 512 544 526.3 544 544C544 561.7 529.7 576 512 576L128 576C110.3 576 96 561.7 96 544C96 526.3 110.3 512 128 512L288 512L288 217.3C264.5 207 246.8 185.7 241.6 160L128 160C110.3 160 96 145.7 96 128C96 110.3 110.3 96 128 96L256 96C270.6 76.6 293.8 64 320 64C346.2 64 369.4 76.6 384 96zM439.6 384L584.4 384L512 259.8L439.6 384zM512 480C449.1 480 396.8 446 386 401.1C383.4 390.1 387 378.8 392.7 369L487.9 205.8C492.9 197.2 502.1 192 512 192C521.9 192 531.1 197.3 536.1 205.8L631.3 369C637 378.8 640.6 390.1 638 401.1C627.2 445.9 574.9 480 512 480zM126.8 259.8L54.4 384L199.3 384L126.8 259.8zM.9 401.1C-1.7 390.1 1.9 378.8 7.6 369L102.8 205.8C107.8 197.2 117 192 126.9 192C136.8 192 146 197.3 151 205.8L246.2 369C251.9 378.8 255.5 390.1 252.9 401.1C242.1 445.9 189.8 480 126.9 480C64 480 11.7 446 .9 401.1z"/></svg>
+                        Julgamento</div>
+
+                    <div class="filters-grid">
+                        <div class="filter-group">
+                            <label class="field-label filter-label-auto">Alegações no Recurso</label>
+                            <div class="filter-input-wrapper">
+                                <input type="text" class="filter-input" placeholder="Digite...">
+                                <div class="operator-toggle" data-operator="contem">
+                                    <div class="operator-current">
+                                        <span class="operator-text">Contém</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="filter-group">
+                            <label class="field-label">Result Julgamento DRJ nível 1</label>
+                            <div class="filter-input-wrapper">
+                                <input type="text" class="filter-input" placeholder="Digite...">
+                                <div class="operator-toggle" data-operator="contem">
+                                    <div class="operator-current">
+                                        <span class="operator-text">Contém</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="filter-group">
+                            <label class="field-label">Result Julgamento DRJ nível 2</label>
+                            <div class="filter-input-wrapper">
+                                <input type="text" class="filter-input" placeholder="Digite...">
+                                <div class="operator-toggle" data-operator="contem">
+                                    <div class="operator-current">
+                                        <span class="operator-text">Contém</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-clear" id="btnClear">Limpar Filtros</button>
+                <div class="footer-right">
+                    <button class="btn-cancel" id="btnCancel">Cancelar</button>
+                    <button class="btn-apply" id="btnApply">Aplicar Filtros</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Função para copiar o valor do campo
+        function copyFieldValue(fieldElement) {
+            const valueElement = fieldElement.querySelector('.field-value');
+            const value = valueElement.textContent.trim();
+
+            // Copiar para o clipboard
+            navigator.clipboard.writeText(value).then(() => {
+                showCopyFeedback(value);
+            }).catch(err => {
+                console.error('Erro ao copiar:', err);
+                // Fallback para navegadores mais antigos
+                fallbackCopyTextToClipboard(value);
+            });
+        }
+
+        // Fallback para navegadores que não suportam navigator.clipboard
+        function fallbackCopyTextToClipboard(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";
+            textArea.style.left = "-999999px";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+
+            try {
+                document.execCommand('copy');
+                showCopyFeedback(text);
+            } catch (err) {
+                console.error('Fallback: Erro ao copiar', err);
+            }
+
+            document.body.removeChild(textArea);
+        }
+
+        // Mostrar feedback visual
+        function showCopyFeedback(copiedText) {
+            // Remover feedback anterior se existir
+            const existingFeedback = document.querySelector('.copy-feedback');
+            if (existingFeedback) {
+                existingFeedback.remove();
+            }
+
+            // Criar novo feedback
+            const feedback = document.createElement('div');
+            feedback.className = 'copy-feedback';
+
+            // Truncar texto muito longo
+            const displayText = copiedText.length > 50
+                ? copiedText.substring(0, 50) + '...'
+                : copiedText;
+
+            feedback.innerHTML = `✓ Copiado: <strong>${displayText}</strong>`;
+            document.body.appendChild(feedback);
+
+            // Remover após 3 segundos
+            setTimeout(() => {
+                feedback.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => feedback.remove(), 300);
+            }, 3000);
+        }
+
+        // Adicionar evento de clique em todos os campos
+        document.addEventListener('DOMContentLoaded', () => {
+            const resultFields = document.querySelectorAll('.result-field');
+
+            resultFields.forEach(field => {
+                field.addEventListener('click', () => {
+                    copyFieldValue(field);
+                });
+            });
+        });
+
+        // Modal de Filtros
+        const modalOverlay = document.getElementById('modalOverlay');
+        const btnFiltros = document.querySelector('.btn-secondary');
+        const closeModal = document.getElementById('closeModal');
+        const btnCancel = document.getElementById('btnCancel');
+        const btnApply = document.getElementById('btnApply');
+        const btnClear = document.getElementById('btnClear');
+
+        // Abrir modal
+        btnFiltros.addEventListener('click', () => {
+            modalOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+
+        // Fechar modal
+        function fecharModal() {
+            modalOverlay.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        closeModal.addEventListener('click', fecharModal);
+        btnCancel.addEventListener('click', fecharModal);
+
+        // Fechar ao clicar no overlay
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) {
+                fecharModal();
+            }
+        });
+
+        // Fechar com ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modalOverlay.classList.contains('active')) {
+                fecharModal();
+            }
+        });
+
+        // Limpar todos os filtros
+        btnClear.addEventListener('click', () => {
+            const inputs = modalOverlay.querySelectorAll('.filter-input, .date-input');
+            inputs.forEach(input => input.value = '');
+
+            // Resetar todos os toggles para "Contém"
+            const operatorToggles = modalOverlay.querySelectorAll('.operator-toggle');
+            operatorToggles.forEach(toggle => {
+                toggle.dataset.operator = 'contem';
+                toggle.querySelector('.operator-text').textContent = 'Contém';
+            });
+
+            console.log('Filtros limpos!');
+        });
+
+        // Aplicar filtros - coletar todos os valores
+        btnApply.addEventListener('click', () => {
+            const filtros = {};
+
+            // Coletar datas
+            const dateInputs = modalOverlay.querySelectorAll('.date-input');
+            dateInputs.forEach((input, index) => {
+                if (input.value) {
+                    filtros[`data_${index}`] = input.value;
+                }
+            });
+
+            // Coletar campos com operadores
+            const filterGroups = modalOverlay.querySelectorAll('.filter-group');
+            filterGroups.forEach(group => {
+                const input = group.querySelector('.filter-input');
+                const operatorToggle = group.querySelector('.operator-toggle');
+                const label = group.querySelector('.filter-label');
+
+                if (input && input.value && label) {
+                    filtros[label.textContent.trim()] = {
+                        valor: input.value,
+                        operador: operatorToggle ? operatorToggle.dataset.operator : null
+                    };
+                }
+            });
+
+            console.log('Filtros aplicados:', filtros);
+            fecharModal();
+        });
+
+        // Inicializar todos os toggles de operador
+        const operatorToggles = document.querySelectorAll('.operator-toggle');
+
+        // Definir os estados do toggle
+        const operatorStates = ['contem', 'nao-contem', 'igual'];
+        const operatorLabels = {
+            'contem': 'Contém',
+            'nao-contem': 'Não Contém',
+            'igual': 'Igual'
+        };
+
+        operatorToggles.forEach(toggle => {
+            const operatorText = toggle.querySelector('.operator-text');
+
+            toggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+
+                // Pegar o estado atual
+                const currentState = toggle.dataset.operator;
+                const currentIndex = operatorStates.indexOf(currentState);
+
+                // Calcular próximo estado (circular)
+                const nextIndex = (currentIndex + 1) % operatorStates.length;
+                const nextState = operatorStates[nextIndex];
+
+                // Atualizar o estado
+                toggle.dataset.operator = nextState;
+                operatorText.textContent = operatorLabels[nextState];
+            });
+        });
+
+       btnApply.addEventListener('click', () => {
+    const filtros = [];
+    
+    // Coletar datas
+    const filterSections = modalOverlay.querySelectorAll('.filter-section');
+    
+    filterSections.forEach(section => {
+        const sectionTitle = section.querySelector('.filter-section-title');
+        
+        // Para filtros de data
+        if (sectionTitle && sectionTitle.textContent.includes('📅')) {
+            const dateGroups = section.querySelectorAll('.filter-group');
+            dateGroups.forEach(group => {
+                const label = group.querySelector('.field-label');
+                const dateInputs = group.querySelectorAll('.date-input');
+                const dateFrom = dateInputs[0]?.value;
+                const dateTo = dateInputs[1]?.value;
+                
+                if (dateFrom || dateTo) {
+                    let valor = '';
+                    if (dateFrom && dateTo) {
+                        valor = `${formatarData(dateFrom)} até ${formatarData(dateTo)}`;
+                    } else if (dateFrom) {
+                        valor = `A partir de ${formatarData(dateFrom)}`;
+                    } else {
+                        valor = `Até ${formatarData(dateTo)}`;
+                    }
+                    
+                    filtros.push({
+                        campo: label.textContent.trim(),
+                        valor: valor,
+                        operador: null,
+                        tipo: 'data'
+                    });
+                }
+            });
+        } else {
+            // Para outros filtros
+            const filterGroups = section.querySelectorAll('.filter-group');
+            filterGroups.forEach(group => {
+                const input = group.querySelector('.filter-input[type="text"]');
+                const numberInputs = group.querySelectorAll('.filter-input[type="number"]');
+                const operatorToggle = group.querySelector('.operator-toggle');
+                const label = group.querySelector('.field-label');
+                
+                // Filtros de valor (min/max)
+                if (numberInputs.length === 2) {
+                    const valorMin = numberInputs[0].value;
+                    const valorMax = numberInputs[1].value;
+                    
+                    if (valorMin || valorMax) {
+                        let valor = '';
+                        if (valorMin && valorMax) {
+                            valor = `R$ ${valorMin} até R$ ${valorMax}`;
+                        } else if (valorMin) {
+                            valor = `Mínimo: R$ ${valorMin}`;
+                        } else {
+                            valor = `Máximo: R$ ${valorMax}`;
+                        }
+                        
+                        filtros.push({
+                            campo: 'Valor',
+                            valor: valor,
+                            operador: null,
+                            tipo: 'valor'
+                        });
+                    }
+                }
+                // Filtros de texto
+                else if (input && input.value && label) {
+                    filtros.push({
+                        campo: label.textContent.trim(),
+                        valor: input.value,
+                        operador: operatorToggle ? operatorToggle.dataset.operator : null,
+                        tipo: 'texto'
+                    });
+                }
+            });
+        }
+    });
+    
+    exibirFiltrosAplicados(filtros);
+    fecharModal();
+});
+
+// Função para formatar data de YYYY-MM-DD para DD/MM/YYYY
+function formatarData(dataISO) {
+    const [ano, mes, dia] = dataISO.split('-');
+    return `${dia}/${mes}/${ano}`;
+}
+
+// Função para exibir os filtros aplicados
+function exibirFiltrosAplicados(filtros) {
+    const appliedFiltersContainer = document.getElementById('appliedFilters');
+    const appliedFiltersList = document.getElementById('appliedFiltersList');
+    
+    if (filtros.length === 0) {
+        appliedFiltersContainer.style.display = 'none';
+        return;
+    }
+    
+    appliedFiltersContainer.style.display = 'block';
+    appliedFiltersList.innerHTML = '';
+    
+    filtros.forEach((filtro, index) => {
+        const filterTag = document.createElement('div');
+        filterTag.className = 'filter-tag';
+        
+        let operadorTexto = '';
+        if (filtro.operador) {
+            const operadorLabels = {
+                'contem': 'contém',
+                'nao-contem': 'não contém',
+                'igual': 'igual a'
+            };
+            operadorTexto = `<span class="filter-operator">${operadorLabels[filtro.operador]}</span>`;
+        }
+        
+        // Adicionar atributo data-operador para aplicar a cor correta
+        if (filtro.operador) {
+            filterTag.setAttribute('data-operador', filtro.operador);
+        } else {
+            filterTag.setAttribute('data-operador', 'null');
+        }
+        
+        filterTag.innerHTML = `
+            <span class="filter-label">${filtro.campo}:</span>
+            ${operadorTexto}
+            <span class="filter-value">"${filtro.valor}"</span>
+            <button class="filter-remove" data-index="${index}" title="Remover filtro">×</button>
+        `;
+        
+        appliedFiltersList.appendChild(filterTag);
+    });
+    
+    // Adicionar evento de remoção individual
+    const removeButtons = appliedFiltersList.querySelectorAll('.filter-remove');
+    removeButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const index = parseInt(e.target.dataset.index);
+            filtros.splice(index, 1);
+            exibirFiltrosAplicados(filtros);
+        });
+    });
+}
+
+// Limpar todos os filtros aplicados
+document.getElementById('btnClearAllFilters').addEventListener('click', () => {
+    exibirFiltrosAplicados([]);
+    // Também limpar os campos do modal
+    const inputs = modalOverlay.querySelectorAll('.filter-input, .date-input');
+    inputs.forEach(input => input.value = '');
+    
+    const operatorToggles = modalOverlay.querySelectorAll('.operator-toggle');
+    operatorToggles.forEach(toggle => {
+        toggle.dataset.operator = 'contem';
+        toggle.querySelector('.operator-text').textContent = 'Contém';
+    });
+});
+
+btnApply.addEventListener('click', () => {
+    const filtros = [];
+    let solrQuery = ''; // Query para enviar ao Solr
+    
+    const filterSections = modalOverlay.querySelectorAll('.filter-section');
+    const today = new Date().toISOString().slice(0, 10);
+    
+    filterSections.forEach(section => {
+        const sectionTitle = section.querySelector('.filter-section-title');
+        
+        // Para filtros de data (identifica pela presença de ícone SVG de calendário)
+        if (sectionTitle && sectionTitle.innerHTML.includes('viewBox="0 0 640 640"')) {
+            const firstIcon = sectionTitle.querySelector('svg');
+            if (firstIcon && firstIcon.innerHTML.includes('M224 64C241.7')) { // SVG do calendário
+                const dateGroups = section.querySelectorAll('.filter-group');
+                dateGroups.forEach(group => {
+                    const label = group.querySelector('.field-label');
+                    const dateInputs = group.querySelectorAll('.date-input');
+                    const dateFrom = dateInputs[0]?.value;
+                    const dateTo = dateInputs[1]?.value;
+                    
+                    if (dateFrom || dateTo) {
+                        let valor = '';
+                        let solrDateFrom = dateFrom ? dateFrom + 'T00:00:00Z' : '*';
+                        let solrDateTo = dateTo ? dateTo + 'T23:59:59Z' : (today + 'T23:59:59Z');
+                        
+                        // Mapear label para campo Solr
+                        const labelText = label.textContent.trim();
+                        let solrField = '';
+                        if (labelText.includes('Protocolo')) {
+                            solrField = 'dt_protocolo_tdt';
+                        } else if (labelText.includes('Juntada')) {
+                            solrField = 'dt_juntada_tdt';
+                        } else if (labelText.includes('Registro')) {
+                            solrField = 'dt_registro_tdt';
+                        } else if (labelText.includes('Anexação')) {
+                            solrField = 'dt_anexacao_tdt';
+                        }
+                        
+                        if (solrField) {
+                            solrQuery += solrField + ':[' + solrDateFrom + ' TO ' + solrDateTo + '] ';
+                        }
+                        
+                        if (dateFrom && dateTo) {
+                            valor = `${formatarData(dateFrom)} até ${formatarData(dateTo)}`;
+                        } else if (dateFrom) {
+                            valor = `A partir de ${formatarData(dateFrom)}`;
+                        } else {
+                            valor = `Até ${formatarData(dateTo)}`;
+                        }
+                        
+                        filtros.push({
+                            campo: labelText,
+                            valor: valor,
+                            operador: null,
+                            tipo: 'data'
+                        });
+                    }
+                });
+            }
+        } else {
+            // Para outros filtros
+            const filterGroups = section.querySelectorAll('.filter-group');
+            filterGroups.forEach(group => {
+                const input = group.querySelector('.filter-input[type="text"]');
+                const numberInputs = group.querySelectorAll('.filter-input[type="number"]');
+                const operatorToggle = group.querySelector('.operator-toggle');
+                const label = group.querySelector('.field-label');
+                
+                // Filtros de valor (min/max)
+                if (numberInputs.length === 2) {
+                    const valorMin = numberInputs[0].value || '*';
+                    const valorMax = numberInputs[1].value || '*';
+                    
+                    if (valorMin !== '*' || valorMax !== '*') {
+                        solrQuery += 'valor_processo_d:[' + valorMin + ' TO ' + valorMax + '] ';
+                        
+                        let valor = '';
+                        if (valorMin !== '*' && valorMax !== '*') {
+                            valor = `R$ ${valorMin} até R$ ${valorMax}`;
+                        } else if (valorMin !== '*') {
+                            valor = `Mínimo: R$ ${valorMin}`;
+                        } else {
+                            valor = `Máximo: R$ ${valorMax}`;
+                        }
+                        
+                        filtros.push({
+                            campo: 'Valor',
+                            valor: valor,
+                            operador: null,
+                            tipo: 'valor'
+                        });
+                    }
+                }
+                // Filtros de texto
+                else if (input && input.value && label) {
+                    const labelText = label.textContent.trim().replace(' (AUTO)', '');
+                    const fieldValue = input.value.trim();
+                    const operador = operatorToggle ? operatorToggle.dataset.operator : 'contem';
+                    
+                    // Mapear label para campo Solr
+                    const fieldMap = {
+                        'Grupo Processo': 'grupo_processo_s',
+                        'Tipo Processo': 'tipo_processo_s',
+                        'Subtipo Processo': 'subtipo_processo_s',
+                        'Nr Processo': 'processo_s',
+                        'Situação do Documento': 'situacao_s',
+                        'Assuntos/Objetos': 'assuntos_objetos_s',
+                        'Tipo do Documento': 'tipo_documento_s',
+                        'Título Documento': 'titulo_s',
+                        'Nr Doc Principal': 'numero_doc_principal_exp_s',
+                        'Tributo ACT': 'tributo_act_s',
+                        'Unidade de Origem do Documento': 'unidade_origem_s',
+                        'Equipe de Origem do Documento': 'equipe_origem_s',
+                        'Unidade Atual': 'nome_unidade_atual_s',
+                        'Equipe Atual': 'nome_equipe_atual_s',
+                        'NI Contribuinte': 'ni_contribuinte_s',
+                        'Nome do Contribuinte': 'nome_contribuinte_s',
+                        'CPF Responsável': 'cpf_responsavel_s',
+                        'Nome Usuário Juntada': 'nome_usuario_juntada_doc_s',
+                        'Nome Relator DRJ': 'nome_relator_drj_s',
+                        'Alegações no Recurso': 'aleg_recurso_contrib_txt',
+                        'Result Julgamento DRJ nível 1': 'result_questdrj_nivel1_s',
+                        'Result Julgamento DRJ nível 2': 'result_questdrj_nivel2_s'
+                    };
+                    
+                    const solrField = fieldMap[labelText];
+                    if (solrField) {
+                        const escapedValue = escapeSolr(fieldValue, solrField);
+                        
+                        if (operador === 'nao-contem') {
+                            solrQuery += '-' + solrField + ':*' + escapedValue + '* ';
+                        } else if (operador === 'igual') {
+                            solrQuery += solrField + ':"' + escapedValue + '" ';
+                        } else { // contem
+                            solrQuery += solrField + ':*' + escapedValue + '* ';
+                        }
+                    }
+                    
+                    filtros.push({
+                        campo: labelText,
+                        valor: fieldValue,
+                        operador: operador,
+                        tipo: 'texto'
+                    });
+                }
+            });
+        }
+    });
+    
+    // Adicionar query ao campo de busca principal
+    if (solrQuery) {
+        const qEl = document.querySelector('.search-input');
+        const currentQuery = qEl.value.trim();
+        qEl.value = currentQuery ? currentQuery + ' ' + solrQuery : solrQuery;
+    }
+    
+    exibirFiltrosAplicados(filtros);
+    fecharModal();
+    
+    console.log('Query Solr gerada:', solrQuery);
+});
+
+// Função para limpar a busca principal
+function clearMainSearch() {
+    var qEl = document.querySelector('.search-input');
+    qEl.value = '';
+    qEl.focus();
+}
+
+// Função para verificar se a query está vazia
+function checkQueryEmpty() {
+    var qEl = document.querySelector('.search-input');
+    if (!qEl.value.trim()) {
+        qEl.value = '*:*';
+    }
+}
+
+function loadValues(input) {
+    var xhr = new XMLHttpRequest();
+    var autoCompleteList = new Array();
+    var campo = input.name;
+
+    if(campo == 'q'){
+        console.log("https://eprocesso-buscador.receita.fazenda/solr/eprocesso/terms?limit=20&terms.prefix="+input.value+"&terms.sort=count&omitHeader=true&terms.fl=conteudo_txt");
+        xhr.open("GET", "https://eprocesso-buscador.receita.fazenda/solr/eprocesso/terms?limit=20&terms.prefix="+input.value+"&terms.sort=count&omitHeader=true&terms.fl=conteudo_txt", true);
+        campo = 'conteudo_txt';
+    } else {
+        console.log("https://eprocesso-buscador.receita.fazenda/solr/eprocesso/terms?limit=20&terms.prefix="+input.value+"&terms.sort=count&omitHeader=true&terms.fl="+input.name);
+        xhr.open("GET", "https://eprocesso-buscador.receita.fazenda/solr/eprocesso/terms?limit=20&terms.prefix="+input.value+"&terms.sort=count&omitHeader=true&terms.fl="+input.name, true);
+    }
+
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            console.log(xhr.responseText);
+            var myArr = JSON.parse(this.responseText);
+            for(i = 0; i < myArr["terms"][campo].length; i=i+2) {
+                autoCompleteList.push(myArr["terms"][campo][i])
+            }
+            console.log(autoCompleteList);
+        }
+    };
+    xhr.send();
+    $("#"+input.name).autocomplete({
+        source: autoCompleteList
+    });
+
+    var elementsWithIdPrefix = $("[id^='ui-id-']");
+    elementsWithIdPrefix.css('z-index', 9999);
+}
+    
+    </script>
+</body>
+
+</html>

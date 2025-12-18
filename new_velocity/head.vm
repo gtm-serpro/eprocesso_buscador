@@ -1,0 +1,223 @@
+##
+## HEAD.VM - <head> section com CSS e JS atualizados
+##
+
+<title>eProcesso Buscador - Receita Federal</title>
+
+## Meta tags
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="author" content="Receita Federal do Brasil">
+<meta name="description" content="Sistema de busca avançada para processos administrativos tributários">
+
+## Favicon
+<link rel="shortcut icon" type="image/png" href="/img/favicon.png">
+
+## =============================================================================
+## CSS - ORDEM IMPORTA!
+## =============================================================================
+
+## 1. jQuery UI (para autocomplete)
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.min.css">
+
+## 2. Font Awesome (ícones)
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+## 3. CSS Principal NOVO (substitui o antigo)
+<link rel="stylesheet" href="/eprocesso/styles.css">
+
+## 4. CSS Legado (apenas se necessário para compatibilidade)
+#if($!request.params.get('legacyMode') == 'true')
+  <link rel="stylesheet" href="/compras/css/main.css">
+#end
+
+## =============================================================================
+## JAVASCRIPT - ORDEM IMPORTA!
+## =============================================================================
+
+## 1. jQuery (necessário para autocomplete e legado)
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+## 2. jQuery UI (para autocomplete)
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+
+## 3. Enhanced Autocomplete (NOVO - mostra domínio ao clicar)
+<script src="/eprocesso/autocomplete-enhanced.js"></script>
+
+## 4. FusionCharts (apenas se debug ativado)
+#if($request.params.get('debugQuery'))
+  <script src="/fusioncharts/js/fusioncharts.js"></script>
+  <script src="/fusioncharts/js/themes/fusioncharts.theme.fint.js"></script>
+#end
+
+## =============================================================================
+## CONFIGURAÇÃO JAVASCRIPT GLOBAL
+## =============================================================================
+<script>
+// Configurações globais
+window.EPROCESSO_CONFIG = {
+  solrBaseUrl: '#{url_for_solr}',
+  autocompleteEnabled: #if($!request.params.get('enableAutocomplete') == 'false')false#{else}true#end,
+  debugMode: #if($request.params.get('debugQuery'))true#{else}false#end,
+  maxRows: 50,
+  defaultRows: 10
+};
+
+// Funções globais essenciais
+window.closeFiltersModal = function() {
+  document.getElementById('modalOverlay').classList.remove('active');
+  document.body.style.overflow = 'auto';
+};
+
+window.openFiltersModal = function() {
+  document.getElementById('modalOverlay').classList.add('active');
+  document.body.style.overflow = 'hidden';
+};
+
+// Feedback visual ao copiar
+window.showCopyFeedback = function(text) {
+  const feedback = document.createElement('div');
+  feedback.className = 'copy-feedback';
+  feedback.innerHTML = '✓ Copiado: <strong>' + text.substring(0, 50) + (text.length > 50 ? '...' : '') + '</strong>';
+  document.body.appendChild(feedback);
+  
+  setTimeout(function() {
+    feedback.style.animation = 'slideOut 0.3s ease-out';
+    setTimeout(function() {
+      feedback.remove();
+    }, 300);
+  }, 2000);
+};
+
+// Utilitários
+window.escapeHtml = function(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+};
+
+window.formatNumber = function(num) {
+  return new Intl.NumberFormat('pt-BR').format(num);
+};
+
+window.formatCurrency = function(num) {
+  return new Intl.NumberFormat('pt-BR', { 
+    style: 'currency', 
+    currency: 'BRL' 
+  }).format(num);
+};
+
+// Debounce para otimização
+window.debounce = function(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(function() {
+      func.apply(this, args);
+    }, wait);
+  };
+};
+</script>
+
+## =============================================================================
+## CSS INLINE PARA CARREGAMENTO CRÍTICO (Above the fold)
+## =============================================================================
+<style>
+/* Critical CSS - renderização inicial rápida */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Rawline', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: #f7f9fa;
+  color: #333;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Loading inicial */
+.loading-initial {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f0f0f0;
+  border-top-color: #1351B4;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Esconder até CSS principal carregar */
+main {
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+main.loaded {
+  opacity: 1;
+}
+</style>
+
+## =============================================================================
+## PRELOAD DE RECURSOS CRÍTICOS
+## =============================================================================
+<link rel="preconnect" href="https://code.jquery.com">
+<link rel="preconnect" href="https://cdnjs.cloudflare.com">
+<link rel="dns-prefetch" href="#{url_for_solr}">
+
+## Preload de fontes (se tiver)
+#if($!customFont)
+  <link rel="preload" href="/fonts/rawline.woff2" as="font" type="font/woff2" crossorigin>
+#end
+
+## =============================================================================
+## PERFORMANCE MONITORING (opcional)
+## =============================================================================
+#if($!request.params.get('monitor') == 'true')
+<script>
+// Monitorar performance
+window.addEventListener('load', function() {
+  const perfData = window.performance.timing;
+  const pageLoadTime = perfData.loadEventEnd - perfData.navigationStart;
+  const connectTime = perfData.responseEnd - perfData.requestStart;
+  
+  console.log('📊 Performance:');
+  console.log('  - Página carregada em:', pageLoadTime, 'ms');
+  console.log('  - Conexão/resposta:', connectTime, 'ms');
+  console.log('  - DOM ready:', perfData.domContentLoadedEventEnd - perfData.navigationStart, 'ms');
+});
+</script>
+#end
+
+## =============================================================================
+## GOOGLE ANALYTICS / MATOMO (se necessário)
+## =============================================================================
+#if($!analyticsId)
+<script async src="https://www.googletagmanager.com/gtag/js?id=$analyticsId"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', '$analyticsId');
+</script>
+#end

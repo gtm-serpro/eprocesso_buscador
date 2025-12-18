@@ -1,0 +1,175 @@
+##
+## FILTER_PROCESSOR.VM - Processa filtros avançados do modal
+## Chamado no início do browse.vm para construir fq[] antes de renderizar
+##
+
+## =============================================================================
+## INICIALIZAÇÃO
+## =============================================================================
+#set($fqList = [])
+#set($today = $date.format("yyyy-MM-dd", $date))
+
+## =============================================================================
+## FUNÇÃO: Escapar valor para Solr
+## =============================================================================
+#macro(escapeSolrValue $value)
+  #set($escaped = $value.replaceAll('([+\-&|!(){}[\]^"~*?:\\])', '\\$1'))
+  $escaped##
+#end
+
+## =============================================================================
+## FUNÇÃO: Construir filtro de data
+## =============================================================================
+#macro(buildDateFilter $fieldName $fromParam $toParam)
+  #set($from = $request.params.get($fromParam))
+  #set($to = $request.params.get($toParam))
+  
+  #if($from || $to)
+    #set($fromValue = "*")
+    #set($toValue = "*")
+    
+    #if($from && $from != "")
+      #set($fromValue = "${from}T00:00:00Z")
+    #end
+    
+    #if($to && $to != "")
+      #set($toValue = "${to}T23:59:59Z")
+    #elseif($from && $from != "")
+      ## Se só tem FROM, vai até hoje
+      #set($toValue = "${today}T23:59:59Z")
+    #end
+    
+    #if($fromValue != "*" || $toValue != "*")
+      #set($filter = "${fieldName}:[${fromValue} TO ${toValue}]")
+      #set($added = $fqList.add($filter))
+    #end
+  #end
+#end
+
+## =============================================================================
+## FUNÇÃO: Construir filtro de texto com operador
+## =============================================================================
+#macro(buildTextFilter $fieldName $valueParam $operatorParam)
+  #set($value = $request.params.get($valueParam))
+  #set($operator = $request.params.get($operatorParam))
+  
+  #if($value && $value.trim() != "")
+    #set($escapedValue = "#escapeSolrValue($value.trim())")
+    
+    ## Default: contém
+    #if(!$operator || $operator == "" || $operator == "contem")
+      #set($filter = "${fieldName}:*${escapedValue}*")
+    
+    ## Não contém (negação)
+    #elseif($operator == "nao-contem")
+      #set($filter = "-${fieldName}:*${escapedValue}*")
+    
+    ## Igual (exato)
+    #elseif($operator == "igual")
+      #set($filter = "${fieldName}:\"${escapedValue}\"")
+    
+    ## Fallback
+    #else
+      #set($filter = "${fieldName}:*${escapedValue}*")
+    #end
+    
+    #set($added = $fqList.add($filter))
+  #end
+#end
+
+## =============================================================================
+## FUNÇÃO: Construir filtro de range numérico
+## =============================================================================
+#macro(buildRangeFilter $fieldName $minParam $maxParam)
+  #set($min = $request.params.get($minParam))
+  #set($max = $request.params.get($maxParam))
+  
+  #if($min || $max)
+    #set($minValue = "*")
+    #set($maxValue = "*")
+    
+    #if($min && $min != "")
+      #set($minValue = $min)
+    #end
+    
+    #if($max && $max != "")
+      #set($maxValue = $max)
+    #end
+    
+    #if($minValue != "*" || $maxValue != "*")
+      #set($filter = "${fieldName}:[${minValue} TO ${maxValue}]")
+      #set($added = $fqList.add($filter))
+    #end
+  #end
+#end
+
+## =============================================================================
+## PROCESSAR FILTROS DE DATA
+## =============================================================================
+#buildDateFilter('dt_protocolo_tdt', 'dt_protocolo_tdt_from', 'dt_protocolo_tdt_to')
+#buildDateFilter('dt_juntada_tdt', 'dt_juntada_tdt_from', 'dt_juntada_tdt_to')
+#buildDateFilter('dt_registro_tdt', 'dt_registro_tdt_from', 'dt_registro_tdt_to')
+#buildDateFilter('dt_anexacao_tdt', 'dt_anexacao_tdt_from', 'dt_anexacao_tdt_to')
+
+## =============================================================================
+## PROCESSAR FILTROS DE TEXTO (Processo e Documento)
+## =============================================================================
+#buildTextFilter('grupo_processo_s', 'grupo_processo_s', 'grupo_processo_s_op')
+#buildTextFilter('tipo_processo_s', 'tipo_processo_s', 'tipo_processo_s_op')
+#buildTextFilter('subtipo_processo_s', 'subtipo_processo_s', 'subtipo_processo_s_op')
+#buildTextFilter('processo_s', 'processo_s', 'processo_s_op')
+#buildTextFilter('situacao_s', 'situacao_s', 'situacao_s_op')
+#buildTextFilter('assuntos_objetos_s', 'assuntos_objetos_s', 'assuntos_objetos_s_op')
+#buildTextFilter('tipo_documento_s', 'tipo_documento_s', 'tipo_documento_s_op')
+#buildTextFilter('titulo_s', 'titulo_s', 'titulo_s_op')
+#buildTextFilter('numero_doc_principal_exp_s', 'numero_doc_principal_exp_s', 'numero_doc_principal_exp_s_op')
+#buildTextFilter('tributo_act_s', 'tributo_act_s', 'tributo_act_s_op')
+
+## =============================================================================
+## PROCESSAR FILTROS DE TEXTO (Unidade e Equipe)
+## =============================================================================
+#buildTextFilter('unidade_origem_s', 'unidade_origem_s', 'unidade_origem_s_op')
+#buildTextFilter('equipe_origem_s', 'equipe_origem_s', 'equipe_origem_s_op')
+#buildTextFilter('nome_unidade_atual_s', 'nome_unidade_atual_s', 'nome_unidade_atual_s_op')
+#buildTextFilter('nome_equipe_atual_s', 'nome_equipe_atual_s', 'nome_equipe_atual_s_op')
+
+## =============================================================================
+## PROCESSAR FILTROS DE TEXTO (Partes Envolvidas)
+## =============================================================================
+#buildTextFilter('ni_contribuinte_s', 'ni_contribuinte_s', 'ni_contribuinte_s_op')
+#buildTextFilter('nome_contribuinte_s', 'nome_contribuinte_s', 'nome_contribuinte_s_op')
+#buildTextFilter('cpf_responsavel_s', 'cpf_responsavel_s', 'cpf_responsavel_s_op')
+#buildTextFilter('nome_usuario_juntada_doc_s', 'nome_usuario_juntada_doc_s', 'nome_usuario_juntada_doc_s_op')
+#buildTextFilter('nome_relator_drj_s', 'nome_relator_drj_s', 'nome_relator_drj_s_op')
+
+## =============================================================================
+## PROCESSAR FILTROS DE TEXTO (Julgamento)
+## =============================================================================
+#buildTextFilter('aleg_recurso_contrib_txt', 'aleg_recurso_contrib_txt', 'aleg_recurso_contrib_txt_op')
+#buildTextFilter('result_questdrj_nivel1_s', 'result_questdrj_nivel1_s', 'result_questdrj_nivel1_s_op')
+#buildTextFilter('result_questdrj_nivel2_s', 'result_questdrj_nivel2_s', 'result_questdrj_nivel2_s_op')
+
+## =============================================================================
+## PROCESSAR FILTRO DE VALOR (Range)
+## =============================================================================
+#buildRangeFilter('valor_processo_d', 'valor_processo_d_min', 'valor_processo_d_max')
+
+## =============================================================================
+## ADICIONAR FILTROS À REQUEST
+## =============================================================================
+#foreach($fq in $fqList)
+  ## Adiciona cada filtro construído como parâmetro fq
+  #set($added = $request.params.add('fq', $fq))
+#end
+
+## =============================================================================
+## LOG DE DEBUG (se ativado)
+## =============================================================================
+#if($request.params.get('debugQuery'))
+  <!-- 
+  FILTROS PROCESSADOS:
+  #foreach($fq in $fqList)
+    - $fq
+  #end
+  -->
+#end

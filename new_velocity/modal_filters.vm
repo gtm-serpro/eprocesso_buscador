@@ -1,0 +1,372 @@
+##
+## MODAL_FILTERS.VM - Modal de Filtros Avançados
+## Integrado com Velocity para submit server-side
+##
+
+## =============================================================================
+## OVERLAY E MODAL
+## =============================================================================
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target === this) closeFiltersModal()">
+  <div class="modal" id="modalBox">
+    
+    ## =============================================================================
+    ## HEADER
+    ## =============================================================================
+    <div class="modal-header">
+      <h2 class="modal-title">Filtros Avançados de Busca</h2>
+      <div class="dialog-controls">
+        <button type="button" class="dialog-close" onclick="closeFiltersModal()" title="Fechar">×</button>
+      </div>
+    </div>
+
+    ## =============================================================================
+    ## FORM (submit server-side)
+    ## =============================================================================
+    <form id="advanced-filters-form" action="#{url_for_home}" method="GET">
+      
+      ## Manter query principal
+      <input type="hidden" name="q" value="$!esc.html($params.get('q'))">
+      
+      ## Manter filtros existentes (opcional - pode querer limpar)
+      #foreach($fq in $request.params.getParams('fq'))
+        <input type="hidden" name="existing_fq" value="$esc.html($fq)">
+      #end
+
+      <div class="modal-body">
+        
+        ## =============================================================================
+        ## SEÇÃO 1: FILTROS DE DATA
+        ## =============================================================================
+        <div class="filter-section">
+          <h3><i class="fas fa-calendar"></i> Filtros de Data</h3>
+          <div class="form-grid form-grid-4">
+            
+            ## Data do Protocolo
+            <div class="form-group">
+              <label>Data do Protocolo</label>
+              <div class="date-group">
+                <div class="date-row">
+                  <label>De:</label>
+                  <input type="date" 
+                         id="dt_protocolo_tdt_from" 
+                         name="dt_protocolo_tdt_from" 
+                         value="$!esc.html($params.get('dt_protocolo_tdt_from'))">
+                </div>
+                <div class="date-row">
+                  <label>Até:</label>
+                  <input type="date" 
+                         id="dt_protocolo_tdt_to" 
+                         name="dt_protocolo_tdt_to" 
+                         value="$!esc.html($params.get('dt_protocolo_tdt_to'))">
+                </div>
+              </div>
+            </div>
+
+            ## Data da Juntada
+            <div class="form-group">
+              <label>Data da Juntada</label>
+              <div class="date-group">
+                <div class="date-row">
+                  <label>De:</label>
+                  <input type="date" 
+                         id="dt_juntada_tdt_from" 
+                         name="dt_juntada_tdt_from" 
+                         value="$!esc.html($params.get('dt_juntada_tdt_from'))">
+                </div>
+                <div class="date-row">
+                  <label>Até:</label>
+                  <input type="date" 
+                         id="dt_juntada_tdt_to" 
+                         name="dt_juntada_tdt_to" 
+                         value="$!esc.html($params.get('dt_juntada_tdt_to'))">
+                </div>
+              </div>
+            </div>
+
+            ## Data de Registro
+            <div class="form-group">
+              <label>Data de Registro</label>
+              <div class="date-group">
+                <div class="date-row">
+                  <label>De:</label>
+                  <input type="date" 
+                         id="dt_registro_tdt_from" 
+                         name="dt_registro_tdt_from" 
+                         value="$!esc.html($params.get('dt_registro_tdt_from'))">
+                </div>
+                <div class="date-row">
+                  <label>Até:</label>
+                  <input type="date" 
+                         id="dt_registro_tdt_to" 
+                         name="dt_registro_tdt_to" 
+                         value="$!esc.html($params.get('dt_registro_tdt_to'))">
+                </div>
+              </div>
+            </div>
+
+            ## Data de Anexação
+            <div class="form-group">
+              <label>Data de Anexação</label>
+              <div class="date-group">
+                <div class="date-row">
+                  <label>De:</label>
+                  <input type="date" 
+                         id="dt_anexacao_tdt_from" 
+                         name="dt_anexacao_tdt_from" 
+                         value="$!esc.html($params.get('dt_anexacao_tdt_from'))">
+                </div>
+                <div class="date-row">
+                  <label>Até:</label>
+                  <input type="date" 
+                         id="dt_anexacao_tdt_to" 
+                         name="dt_anexacao_tdt_to" 
+                         value="$!esc.html($params.get('dt_anexacao_tdt_to'))">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        ## =============================================================================
+        ## SEÇÃO 2: PROCESSO E DOCUMENTO
+        ## =============================================================================
+        <div class="filter-section">
+          <h3><i class="fas fa-file"></i> Processo e Documento</h3>
+          <div class="form-grid">
+            
+            ## Macro para campos de texto com operador
+            #macro(textFieldWithOperator $id $label $hasAuto)
+              <div class="form-group">
+                #if($hasAuto)
+                  <div class="field-wrapper">
+                    <span class="autocomplete-badge">AUTO</span>
+                    <label>$label</label>
+                  </div>
+                #else
+                  <label>$label</label>
+                #end
+                <div class="field-group">
+                  <input type="text" 
+                         id="${id}" 
+                         name="${id}" 
+                         placeholder="$label"
+                         value="$!esc.html($params.get($id))"
+                         autocomplete="off"
+                         class="filter-input">
+                  <input type="hidden" 
+                         id="${id}_op" 
+                         name="${id}_op" 
+                         value="$!esc.html($params.get('${id}_op'))"
+                         class="operator-value">
+                  <div class="toggle-switch" 
+                       data-mode="contem" 
+                       data-target="${id}_op"
+                       onclick="toggleOperator(this)">
+                    <span class="toggle-icon">✓</span>
+                    <span class="toggle-text">Contém</span>
+                  </div>
+                </div>
+              </div>
+            #end
+
+            ## Campos
+            #textFieldWithOperator('grupo_processo_s', 'Grupo Processo', true)
+            #textFieldWithOperator('tipo_processo_s', 'Tipo Processo', true)
+            #textFieldWithOperator('subtipo_processo_s', 'Subtipo Processo', true)
+            #textFieldWithOperator('processo_s', 'Nr Processo', false)
+            #textFieldWithOperator('situacao_s', 'Situação do Documento', true)
+            #textFieldWithOperator('assuntos_objetos_s', 'Assuntos/Objetos', false)
+            #textFieldWithOperator('tipo_documento_s', 'Tipo do Documento', true)
+            #textFieldWithOperator('titulo_s', 'Título Documento', false)
+            #textFieldWithOperator('numero_doc_principal_exp_s', 'Nr Doc Principal', false)
+            #textFieldWithOperator('tributo_act_s', 'Tributo ACT', true)
+
+            ## Valor do Processo
+            <div class="filter-value">
+              <div>
+                <label class="field-label">Valor Mínimo</label>
+                <input type="number" 
+                       id="valor_processo_d_min" 
+                       name="valor_processo_d_min" 
+                       placeholder="R$ 0,00"
+                       value="$!esc.html($params.get('valor_processo_d_min'))"
+                       class="filter-input">
+              </div>
+              <div>
+                <label class="field-label">Valor Máximo</label>
+                <input type="number" 
+                       id="valor_processo_d_max" 
+                       name="valor_processo_d_max" 
+                       placeholder="R$ 0,00"
+                       value="$!esc.html($params.get('valor_processo_d_max'))"
+                       class="filter-input">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        ## =============================================================================
+        ## SEÇÃO 3: UNIDADE E EQUIPE
+        ## =============================================================================
+        <div class="filter-section">
+          <h3><i class="fas fa-people-group"></i> Unidade e Equipe</h3>
+          <div class="form-grid form-grid-2">
+            #textFieldWithOperator('unidade_origem_s', 'Unidade de Origem do Documento', true)
+            #textFieldWithOperator('equipe_origem_s', 'Equipe de Origem do Documento', true)
+            #textFieldWithOperator('nome_unidade_atual_s', 'Unidade Atual', true)
+            #textFieldWithOperator('nome_equipe_atual_s', 'Equipe Atual', true)
+          </div>
+        </div>
+
+        ## =============================================================================
+        ## SEÇÃO 4: PARTES ENVOLVIDAS
+        ## =============================================================================
+        <div class="filter-section">
+          <h3><i class="fas fa-user"></i> Partes Envolvidas</h3>
+          <div class="form-grid">
+            #textFieldWithOperator('ni_contribuinte_s', 'NI Contribuinte', false)
+            #textFieldWithOperator('nome_contribuinte_s', 'Nome do Contribuinte', false)
+            #textFieldWithOperator('cpf_responsavel_s', 'CPF Responsável', false)
+            #textFieldWithOperator('nome_usuario_juntada_doc_s', 'Nome Usuário Juntada', false)
+            #textFieldWithOperator('nome_relator_drj_s', 'Nome Relator DRJ', false)
+          </div>
+        </div>
+
+        ## =============================================================================
+        ## SEÇÃO 5: JULGAMENTO
+        ## =============================================================================
+        <div class="filter-section">
+          <h3><i class="fas fa-scale-balanced"></i> Julgamento</h3>
+          <div class="form-grid">
+            #textFieldWithOperator('aleg_recurso_contrib_txt', 'Alegações no Recurso', true)
+            #textFieldWithOperator('result_questdrj_nivel1_s', 'Result Julgamento DRJ nível 1', true)
+            #textFieldWithOperator('result_questdrj_nivel2_s', 'Result Julgamento DRJ nível 2', false)
+          </div>
+        </div>
+
+      </div>
+
+      ## =============================================================================
+      ## FOOTER COM BOTÕES
+      ## =============================================================================
+      <div class="modal-footer">
+        <button type="button" 
+                class="btn btn-secondary" 
+                onclick="clearAllFilters()">
+          Limpar Filtros
+        </button>
+        
+        <div class="footer-right">
+          <button type="button" 
+                  class="btn btn-secondary" 
+                  onclick="closeFiltersModal()">
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn-primary">
+            Aplicar Filtros
+          </button>
+        </div>
+      </div>
+    </form>
+
+  </div>
+</div>
+
+## =============================================================================
+## JAVASCRIPT PARA FUNCIONALIDADES DO MODAL
+## =============================================================================
+<script>
+// Toggle de Operadores (Contém / Não Contém / Igual)
+function toggleOperator(element) {
+  const states = ['contem', 'nao-contem', 'igual'];
+  const icons = ['✓', '✗', '='];
+  const texts = ['Contém', 'Não Contém', 'Igual'];
+  
+  const currentMode = element.dataset.mode || 'contem';
+  const currentIndex = states.indexOf(currentMode);
+  const nextIndex = (currentIndex + 1) % states.length;
+  const nextState = states[nextIndex];
+  
+  element.dataset.mode = nextState;
+  element.querySelector('.toggle-icon').textContent = icons[nextIndex];
+  element.querySelector('.toggle-text').textContent = texts[nextIndex];
+  
+  // Atualizar campo hidden
+  const targetId = element.dataset.target;
+  if (targetId) {
+    document.getElementById(targetId).value = nextState;
+  }
+  
+  // Visual feedback
+  element.classList.remove('exclude', 'exact');
+  if (nextState === 'nao-contem') {
+    element.classList.add('exclude');
+  } else if (nextState === 'igual') {
+    element.classList.add('exact');
+  }
+}
+
+// Limpar todos os filtros
+function clearAllFilters() {
+  // Limpar inputs de texto
+  document.querySelectorAll('.modal-body input[type="text"]').forEach(input => {
+    input.value = '';
+  });
+  
+  // Limpar inputs de data
+  document.querySelectorAll('.modal-body input[type="date"]').forEach(input => {
+    input.value = '';
+  });
+  
+  // Limpar inputs de número
+  document.querySelectorAll('.modal-body input[type="number"]').forEach(input => {
+    input.value = '';
+  });
+  
+  // Resetar operadores
+  document.querySelectorAll('.toggle-switch').forEach(toggle => {
+    toggle.dataset.mode = 'contem';
+    toggle.querySelector('.toggle-icon').textContent = '✓';
+    toggle.querySelector('.toggle-text').textContent = 'Contém';
+    toggle.classList.remove('exclude', 'exact');
+    
+    const targetId = toggle.dataset.target;
+    if (targetId) {
+      document.getElementById(targetId).value = 'contem';
+    }
+  });
+}
+
+// Fechar modal com ESC
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closeFiltersModal();
+  }
+});
+
+// O autocomplete já é inicializado automaticamente pelo autocomplete-enhanced.js
+// Não precisa de código adicional aqui
+
+// Restaurar estado dos operadores ao carregar
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.operator-value').forEach(hidden => {
+    const operator = hidden.value;
+    if (operator && operator !== 'contem') {
+      const toggle = hidden.previousElementSibling;
+      if (toggle && toggle.classList.contains('toggle-switch')) {
+        toggle.dataset.mode = operator;
+        
+        if (operator === 'nao-contem') {
+          toggle.classList.add('exclude');
+          toggle.querySelector('.toggle-icon').textContent = '✗';
+          toggle.querySelector('.toggle-text').textContent = 'Não Contém';
+        } else if (operator === 'igual') {
+          toggle.classList.add('exact');
+          toggle.querySelector('.toggle-icon').textContent = '=';
+          toggle.querySelector('.toggle-text').textContent = 'Igual';
+        }
+      }
+    }
+  });
+});
+</script>

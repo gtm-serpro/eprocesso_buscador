@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  SOLRCONFIG.XML - OTIMIZADO PARA GRANDES VOLUMES
+  Configurações para lidar com milhões de registros
+-->
+
+<config>
+  
+  <!-- ========================================================================
+       CACHES - CRÍTICO PARA PERFORMANCE
+       ======================================================================== -->
+  
+  <!-- Filter Cache: cacheia fq (facetas, filtros) -->
+  <query>
+    <filterCache 
+      class="solr.CaffeineCache" 
+      size="512"                  <!-- Aumentado de 128 -->
+      initialSize="256"
+      autowarmCount="128"
+      async="true"                <!-- Async warming -->
+      maxRamMB="512"/>            <!-- Limite de RAM -->
+    
+    <!-- Query Result Cache: cacheia resultados paginados -->
+    <queryResultCache 
+      class="solr.CaffeineCache" 
+      size="256"                  <!-- Páginas cacheadas -->
+      initialSize="128"
+      autowarmCount="64"
+      async="true"
+      maxRamMB="256"/>
+    
+    <!-- Document Cache: cacheia documentos frequentes -->
+    <documentCache 
+      class="solr.CaffeineCache" 
+      size="16384"                <!-- 16K docs cacheados -->
+      initialSize="8192"
+      autowarmCount="4096"
+      maxRamMB="512"/>
+    
+    <!-- Field Value Cache: para sorting e faceting -->
+    <fieldValueCache 
+      class="solr.CaffeineCache" 
+      size="512"
+      initialSize="256"
+      autowarmCount="128"
+      maxRamMB="256"/>
+  </query>
+
+  <!-- ========================================================================
+       REQUEST HANDLER: /browse (Velocity)
+       ======================================================================== -->
+  
+  <requestHandler name="/browse" class="solr.SearchHandler">
+    <lst name="defaults">
+      <!-- Query -->
+      <str name="defType">edismax</str>
+      <str name="q.alt">*:*</str>
+      <str name="qf">conteudo_txt^2.0 titulo_s^3.0 processo_s^5.0</str>
+      
+      <!-- Paginação -->
+      <int name="rows">10</int>
+      <int name="start">0</int>
+      
+      <!-- Facetas -->
+      <str name="facet">true</str>
+      <str name="facet.mincount">1</str>
+      <int name="facet.limit">20</int>        <!-- Máximo 20 facetas por campo -->
+      <str name="facet.threads">true</str>    <!-- CRÍTICO: Paralelizar facetas -->
+      <str name="facet.field">tipo_documento_s</str>
+      <str name="facet.field">grupo_processo_s</str>
+      <str name="facet.field">unidade_origem_s</str>
+      <str name="facet.field">tributo_act_s</str>
+      <str name="facet.field">situacao_s</str>
+      
+      <!-- Highlighting -->
+      <str name="hl">on</str>
+      <str name="hl.fl">conteudo_txt</str>
+      <int name="hl.snippets">2</int>
+      <int name="hl.fragsize">150</int>
+      <str name="hl.simple.pre">&lt;mark&gt;</str>
+      <str name="hl.simple.post">&lt;/mark&gt;</str>
+      <str name="hl.method">unified</str>     <!-- Mais rápido que fastVector -->
+      
+      <!-- Timeout -->
+      <int name="timeAllowed">5000</int>      <!-- 5 segundos máximo -->
+      
+      <!-- Velocity -->
+      <str name="wt">velocity</str>
+      <str name="v.template">browse</str>
+      <str name="v.layout">layout</str>
+      <str name="v.contentType">text/html;charset=UTF-8</str>
+      
+      <!-- Otimizações -->
+      <str name="omitHeader">false</str>
+      <str name="echoParams">explicit</str>
+    </lst>
+    
+    <!-- Componentes -->
+    <arr name="components">
+      <str>query</str>
+      <str>facet</str>
+      <str>mlt</str>
+      <str>highlight</str>
+      <str>debug</str>
+    </arr>
+    
+    <!-- Last Components (Velocity) -->
+    <arr name="last-components">
+      <str>velocity</str>
+    </arr>
+  </requestHandler>
+
+  <!-- ========================================================================
+       REQUEST HANDLER: /terms (Autocomplete)
+       ======================================================================== -->
+  
+  <requestHandler name="/terms" class="solr.SearchHandler">
+    <lst name="defaults">
+      <str name="terms">true</str>
+      <str name="terms.sort">count</str>
+      <int name="terms.limit">10</int>
+      <str name="terms.mincount">1</str>
+      <str name="terms.maxcount">-1</str>
+      <str name="wt">json</str>
+      <str name="omitHeader">true</str>
+    </lst>
+    
+    <arr name="components">
+      <str>terms</str>
+    </arr>
+  </requestHandler>
+
+  <!-- ========================================================================
+       REQUEST HANDLER: /select (API JSON)
+       ======================================================================== -->
+  
+  <requestHandler name="/select" class="solr.SearchHandler">
+    <lst name="defaults">
+      <str name="defType">edismax</str>
+      <str name="q.alt">*:*</str>
+      <str name="qf">conteudo_txt^2.0 titulo_s^3.0 processo_s^5.0</str>
+      
+      <int name="rows">10</int>
+      <int name="start">0</int>
+      
+      <!-- LIMITE MÁXIMO (SEGURANÇA) -->
+      <int name="maxRows">50</int>
+      
+      <str name="wt">json</str>
+      <str name="indent">false</str>
+      <int name="timeAllowed">5000</int>
+    </lst>
+  </requestHandler>
+
+  <!-- ========================================================================
+       REQUEST HANDLER: /export (CSV, grandes volumes)
+       ======================================================================== -->
+  
+  <requestHandler name="/export" class="solr.SearchHandler">
+    <lst name="defaults">
+      <str name="defType">edismax</str>
+      <str name="q.alt">*:*</str>
+      
+      <!-- Para export, permitir mais rows mas com timeout curto -->
+      <int name="rows">1000</int>
+      <int name="maxRows">10000</int>       <!-- Máximo absoluto -->
+      <int name="timeAllowed">30000</int>   <!-- 30 segundos -->
+      
+      <str name="wt">csv</str>
+      <str name="csv.separator">,</str>
+      <str name="csv.header">true</str>
+      <str name="csv.newline">\n</str>
+      
+      <!-- Campos a exportar -->
+      <str name="fl">id,processo_s,tipo_documento_s,dt_protocolo_tdt,unidade_origem_s,tributo_act_s</str>
+    </lst>
+  </requestHandler>
+
+  <!-- ========================================================================
+       VELOCITY RESPONSE WRITER
+       ======================================================================== -->
+  
+  <queryResponseWriter name="velocity" 
+                       class="solr.VelocityResponseWriter">
+    <str name="template.base.dir">${velocity.template.base.dir:}</str>
+    <str name="solr.resource.loader.enabled">true</str>
+    <str name="params.resource.loader.enabled">false</str>
+    
+    <!-- Cache de templates -->
+    <str name="velocity.properties">
+      resource.loader.class=org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader
+      velocimacro.library.autoreload=false
+      velocimacro.permissions.allow.inline.local.scope=true
+      runtime.log.logsystem.class=org.apache.velocity.runtime.log.NullLogChute
+      resource.manager.cache.class=org.apache.velocity.runtime.resource.ResourceCacheImpl
+    </str>
+  </queryResponseWriter>
+
+  <!-- ========================================================================
+       CIRCUIT BREAKER (Solr 8.7+)
+       Protege contra queries muito pesadas
+       ======================================================================== -->
+  
+  <circuitBreaker>
+    <str name="memThreshold">75</str>      <!-- 75% da heap -->
+    <str name="cpuThreshold">90</str>      <!-- 90% CPU -->
+  </circuitBreaker>
+
+  <!-- ========================================================================
+       QUERY PARSER (edismax configurado)
+       ======================================================================== -->
+  
+  <queryParser name="edismax" 
+               class="solr.ExtendedDismaxQParserPlugin">
+    <str name="mm">2&lt;-25% 9&lt;-3</str>
+    <float name="tie">0.1</float>
+  </queryParser>
+
+  <!-- ========================================================================
+       UPDATE HANDLER (otimizado para indexação)
+       ======================================================================== -->
+  
+  <updateHandler class="solr.DirectUpdateHandler2">
+    <updateLog>
+      <str name="dir">${solr.ulog.dir:}</str>
+      <int name="numVersionBuckets">65536</int>
+    </updateLog>
+    
+    <autoCommit>
+      <maxTime>${solr.autoCommit.maxTime:60000}</maxTime>
+      <maxDocs>10000</maxDocs>
+      <openSearcher>false</openSearcher>
+    </autoCommit>
+    
+    <autoSoftCommit>
+      <maxTime>${solr.autoSoftCommit.maxTime:10000}</maxTime>
+    </autoSoftCommit>
+  </updateHandler>
+
+  <!-- ========================================================================
+       ADMIN HANDLERS
+       ======================================================================== -->
+  
+  <requestHandler name="/admin/ping" class="solr.PingRequestHandler">
+    <lst name="invariants">
+      <str name="q">*:*</str>
+    </lst>
+    <lst name="defaults">
+      <str name="echoParams">all</str>
+    </lst>
+  </requestHandler>
+
+  <!-- ========================================================================
+       DIRECTORY FACTORY (otimizado)
+       ======================================================================== -->
+  
+  <directoryFactory name="DirectoryFactory" 
+                    class="${solr.directoryFactory:solr.NRTCachingDirectoryFactory}">
+    <int name="maxCachedMB">192</int>
+    <int name="maxMergeSizeMB">16</int>
+  </directoryFactory>
+
+  <!-- ========================================================================
+       INDEX CONFIG (otimizado para leitura)
+       ======================================================================== -->
+  
+  <indexConfig>
+    <ramBufferSizeMB>256</ramBufferSizeMB>
+    <maxBufferedDocs>10000</maxBufferedDocs>
+    
+    <mergePolicyFactory class="org.apache.solr.index.TieredMergePolicyFactory">
+      <int name="maxMergeAtOnce">10</int>
+      <int name="segmentsPerTier">10</int>
+    </mergePolicyFactory>
+    
+    <mergeScheduler class="org.apache.lucene.index.ConcurrentMergeScheduler">
+      <int name="maxThreadCount">4</int>
+      <int name="maxMergeCount">6</int>
+    </mergeScheduler>
+    
+    <lockType>native</lockType>
+    
+    <useCompoundFile>false</useCompoundFile>
+    
+    <writeLockTimeout>10000</writeLockTimeout>
+  </indexConfig>
+
+  <!-- ========================================================================
+       JMX (monitoramento)
+       ======================================================================== -->
+  
+  <jmx />
+
+</config>

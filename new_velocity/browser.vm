@@ -1,0 +1,383 @@
+##
+## BROWSE.VM - Adaptado EXATAMENTE do index.html fornecido
+##
+
+## =============================================================================
+## SEGURANÇA: Limitar rows
+## =============================================================================
+#set($maxRows = 50)
+#set($requestedRows = $params.getInt('rows', 10))
+#if($requestedRows > $maxRows)
+  #set($dummy = $params.set('rows', $maxRows))
+#end
+
+## =============================================================================
+## PROCESSADOR DE FILTROS (se vier do modal)
+## =============================================================================
+#parse('filter_processor.vm')
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eProcesso Buscador</title>
+    <link rel="stylesheet" href="/eprocesso/styles.css">
+</head>
+<body>
+    <!-- HEADER -->
+    <header>
+        <div class="header-content">
+            <div class="logo-container">
+                <img src="/img/eProcessoBuscador.svg" alt="eProcesso Buscador">
+            </div>
+
+            <div class="search-bar">
+                <form id="query-form" action="#{url_for_home}" method="GET">
+                    <div class="search-input-container">
+                        <input type="text" 
+                               class="search-input" 
+                               id="q" 
+                               name="q" 
+                               value="$!esc.html($params.get('q'))"
+                               placeholder="Digite sua busca..." 
+                               autocomplete="off">
+                        <button type="button" 
+                                class="clear-input-btn" 
+                                onclick="clearMainSearch()" 
+                                title="Limpar busca">×</button>
+                    </div>
+                    <button type="submit" class="btn btn-primary" onclick="checkQueryEmpty()">Buscar</button>
+                    <button type="button" class="btn btn-secondary btn-filter" onclick="openDialog()">
+                        <img src="/img/filter-solid-full.svg" alt="" class="filter-icon">
+                        <span class="filter-text">Filtros Avançados</span>
+                    </button>
+
+                    ## Manter parâmetros
+                    #foreach($fq in $request.params.getParams('fq'))
+                      <input type="hidden" name="fq" value="$esc.html($fq)">
+                    #end
+                    #if($request.params.get('debugQuery'))
+                      <input type="hidden" name="debugQuery" value="true">
+                    #end
+                </form>
+            </div>
+
+            <div class="institutions">
+                <img src="/img/Receita.svg" alt="Receita Federal">
+                <img src="/img/PGFN.svg" alt="PGFN">
+                <img src="/img/CARF.svg" alt="CARF">
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN -->
+    <main>
+        <!-- SIDEBAR -->
+        <aside>
+            <div class="faceted-search">
+                <div class="faceted-title">Busca Facetada</div>
+                
+                #if($response.response.numFound > 0 && $response.facetFields)
+                  #foreach($field in $response.facetFields)
+                    #if($field.values.size() > 0)
+                      <div class="facet-group">
+                        <div class="facet-label">
+                          #if($field.name == 'tipo_documento_s')Tipo de Documento
+                          #elseif($field.name == 'grupo_processo_s')Grupo de Processo
+                          #elseif($field.name == 'unidade_origem_s')Unidade de Origem
+                          #elseif($field.name == 'tributo_act_s')Tributo
+                          #elseif($field.name == 'situacao_s')Situação
+                          #elseif($field.name == 'tipo_processo_s')Tipo de Processo
+                          #else$field.name
+                          #end
+                        </div>
+                        
+                        #set($maxFacets = 10)
+                        #set($facetCount = 0)
+                        #foreach($facet in $field.values)
+                          #if($facetCount < $maxFacets)
+                            <div class="facet-item">
+                              <a href="#url_for_facet_filter($field.name, $facet.name)" 
+                                 class="facet-link">
+                                #if($facet.name)
+                                  $esc.html($display.truncate($facet.name, 30))
+                                #else
+                                  <em>não informado</em>
+                                #end
+                              </a>
+                              <span class="facet-badge">$facet.count</span>
+                            </div>
+                            #set($facetCount = $facetCount + 1)
+                          #end
+                        #end
+                      </div>
+                    #end
+                  #end
+                #else
+                  <div class="facet-group">
+                    <div class="facet-label">Grupo</div>
+                    <div class="facet-item">
+                      <a href="#" class="facet-link">Nome do Processo</a>
+                      <span class="facet-badge">123</span>
+                    </div>
+                    <div class="facet-item">
+                      <a href="#" class="facet-link">Tipo de Documento</a>
+                      <span class="facet-badge">45</span>
+                    </div>
+                    <div class="facet-item">
+                      <a href="#" class="facet-link">Unidade</a>
+                      <span class="facet-badge">78</span>
+                    </div>
+                  </div>
+                #end
+            </div>
+        </aside>
+
+        <!-- RESULTS -->
+        <section class="results-section">
+            <!-- Filtros Aplicados -->
+            #if($request.params.getParams('fq').size() > 0)
+              <div class="applied-filters border-primary" id="appliedFilters">
+                <div class="applied-filters-header">
+                  <span class="applied-filters-title">Filtros aplicados:</span>
+                  <button class="btn btn-clear-all" 
+                          onclick="window.location.href='#{url_for_home}?q=$!esc.url($params.get('q'))'">
+                    Limpar todos
+                  </button>
+                </div>
+                <div class="applied-filters-list" id="appliedFiltersList">
+                  #foreach($fq in $request.params.getParams('fq'))
+                    #set($fqIndex = $velocityCount - 1)
+                    <div class="filter-tag">
+                      <span class="filter-label">Filtro:</span>
+                      <span class="filter-value">"$esc.html($fq)"</span>
+                      <button class="filter-remove" 
+                              onclick="window.location.href='#url_for_filters($request.params.getParams('fq').subList(0,$fqIndex))'">
+                        ×
+                      </button>
+                    </div>
+                  #end
+                </div>
+              </div>
+            #end
+
+            <!-- Result Cards -->
+            <div class="results-container" id="resultsContainer">
+              #if($response.response.error)
+                <div class="error-state">
+                  <h3>Erro na busca</h3>
+                  <p>$response.response.error.msg</p>
+                </div>
+              #elseif($response.response.numFound == 0)
+                <div class="empty-state">
+                  <p>Nenhum resultado encontrado</p>
+                </div>
+              #else
+                #foreach($doc in $response.results)
+                  #set($docId = $doc.getFieldValue('id'))
+                  
+                  <article class="result-card">
+                    <div class="result-header">
+                      <div class="result-icon">
+                        #set($pdfUrl = "https://eprocesso.suiterfb.receita.fazenda/eprocesso/api/documentos/${docId}/obterbinario/download")
+                        #set($pdfUrlOCR = "https://eprocesso.suiterfb.receita.fazenda/eprocesso/api/documentos/${docId}/obterbinarioocr/download")
+                        
+                        #if($doc.getFieldValue('arquivo_indexado_s') == 'S')
+                          #if($doc.getFieldValue('indicador_pesquisavel_s') == 'S')
+                            <a href="$pdfUrlOCR" target="_blank">
+                              <img src="/img/file-pdf-solid-full.svg" alt="PDF">
+                            </a>
+                          #end
+                          <a href="$pdfUrl" target="_blank">
+                            <img src="/img/file-pdf-regular-full.svg" alt="PDF">
+                          </a>
+                        #else
+                          <img src="/img/file-pdf-regular-full.svg" alt="Sem PDF" style="opacity:0.3;">
+                        #end
+                      </div>
+                      
+                      <span>
+                        #if($doc.getFieldValue('titulo_s'))
+                          $esc.html($doc.getFieldValue('titulo_s'))
+                        #elseif($doc.getFieldValue('tipo_documento_s'))
+                          $esc.html($doc.getFieldValue('tipo_documento_s'))
+                        #else
+                          Documento sem título
+                        #end
+                      </span>
+                    </div>
+
+                    <div class="result-grid">
+                      #macro(renderField $label $value)
+                        #if($value)
+                          <div class="result-field" onclick="navigator.clipboard.writeText('$esc.javascript($value)').then(() => showCopyFeedback('$esc.javascript($value)'))">
+                            <div class="field-label">$label</div>
+                            <div class="field-value">$esc.html($value)</div>
+                          </div>
+                        #end
+                      #end
+                      
+                      #renderField('Número do processo', $doc.getFieldValue('processo_s'))
+                      
+                      #if($doc.getFieldValue('dt_protocolo_tdt'))
+                        #set($dt = $doc.getFieldValue('dt_protocolo_tdt'))
+                        #renderField('Data protocolo', $date.format('dd/MM/yyyy HH:mm', $dt, $date.getLocale(), $date.getTimeZone().getTimeZone('UTC')))
+                      #end
+                      
+                      #if($doc.getFieldValue('dt_juntada_tdt'))
+                        #set($dt = $doc.getFieldValue('dt_juntada_tdt'))
+                        #renderField('Data juntada', $date.format('dd/MM/yyyy HH:mm', $dt, $date.getLocale(), $date.getTimeZone().getTimeZone('UTC')))
+                      #end
+                      
+                      #renderField('Unidade origem', $doc.getFieldValue('unidade_origem_s'))
+                      #renderField('Tipo documento', $doc.getFieldValue('tipo_documento_s'))
+                      #renderField('Grupo processo', $doc.getFieldValue('grupo_processo_s'))
+                      #renderField('NI Contribuinte', $doc.getFieldValue('ni_contribuinte_s'))
+                      #renderField('Nome Contribuinte', $doc.getFieldValue('nome_contribuinte_s'))
+                      #renderField('Tributo ACT', $doc.getFieldValue('tributo_act_s'))
+                      
+                      #if($response.highlighting.get($docId).get('conteudo_txt'))
+                        <div class="result-field" style="grid-column: 1 / -1;">
+                          <div class="field-label">Trecho</div>
+                          <div class="field-value">
+                            #foreach($snippet in $response.highlighting.get($docId).get('conteudo_txt'))
+                              $snippet
+                            #end
+                          </div>
+                        </div>
+                      #end
+                    </div>
+                  </article>
+                #end
+              #end
+            </div>
+
+            <!-- Footer -->
+            <footer>
+              <div class="footer-left">
+                <span>
+                  <span class="results-found">
+                    #if($response.response.numFound)
+                      $number.format('#,##0', $response.response.numFound)
+                    #else
+                      0
+                    #end
+                  </span> 
+                  resultados encontrados
+                </span>
+                <div class="export-buttons">
+                  #set($startPage = ($page.current_page_number - 1) * $page.results_per_page)
+                  <a href="#url_for_lens&wt=xml&start=$startPage" class="export-btn" data-format="xml">XML</a>
+                  <a href="#url_for_lens&wt=json&start=$startPage" class="export-btn" data-format="json">JSON</a>
+                  <a href="#url_for_lens&wt=csv&start=$startPage" class="export-btn" data-format="csv">CSV</a>
+                </div>
+              </div>
+              <div class="pagination">
+                #if($page.current_page_number > 1)
+                  #set($prev_start = $page.start - $page.results_per_page)
+                  <button onclick="window.location.href='#url_for_start($prev_start)'">Anterior</button>
+                #else
+                  <button disabled>Anterior</button>
+                #end
+
+                <span>
+                  Página <span class="page-num">$page.current_page_number</span>
+                  de <span class="page-count">$number.format('#,##0', $page.page_count)</span>
+                </span>
+
+                #if($page.current_page_number < $page.page_count)
+                  #set($next_start = $page.start + $page.results_per_page)
+                  <button onclick="window.location.href='#url_for_start($next_start)'">Próxima</button>
+                #else
+                  <button disabled>Próxima</button>
+                #end
+              </div>
+            </footer>
+        </section>
+    </main>
+
+    <!-- MODAL FILTROS -->
+    #parse('modal_filters.vm')
+
+    <!-- SCRIPTS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <script src="/eprocesso/app.js"></script>
+    <script src="/eprocesso/card_manager.js"></script>
+    <script src="/eprocesso/busca_facetada.js"></script>
+    <script src="/eprocesso/autocomplete-enhanced.js"></script>
+    
+    <script>
+    // Funções inline do HTML original
+    function clearMainSearch() {
+        var qEl = document.getElementById('q');
+        qEl.value = '';
+        qEl.focus();
+        updateClearButton();
+    }
+
+    function updateClearButton() {
+        var qEl = document.getElementById('q');
+        var clearBtn = document.querySelector('.clear-input-btn');
+        if (qEl.value.trim()) {
+            clearBtn.style.display = 'flex';
+        } else {
+            clearBtn.style.display = 'none';
+        }
+    }
+
+    function checkQueryEmpty() {
+        var qEl = document.getElementById('q');
+        if (!qEl.value.trim()) qEl.value = '*:*';
+    }
+
+    function openDialog() {
+        document.getElementById('modalOverlay').classList.add('active');
+        document.getElementById('dialogBox').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeDialog(event) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        document.getElementById('modalOverlay').classList.remove('active');
+        document.getElementById('dialogBox').classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    function showCopyFeedback(text) {
+        var existing = document.querySelector('.copy-feedback');
+        if (existing) existing.remove();
+
+        var feedback = document.createElement('div');
+        feedback.className = 'copy-feedback';
+        feedback.innerHTML = '✓ Copiado: <strong>' + text.substring(0, 50) + (text.length > 50 ? '...' : '') + '</strong>';
+        document.body.appendChild(feedback);
+
+        setTimeout(function() {
+            feedback.style.animation = 'slideOut 0.3s ease-out';
+            setTimeout(function() {
+                feedback.remove();
+            }, 300);
+        }, 2000);
+    }
+
+    // Inicialização
+    document.addEventListener('DOMContentLoaded', function() {
+        var qInput = document.getElementById('q');
+        if (qInput) {
+            qInput.addEventListener('input', updateClearButton);
+            updateClearButton();
+        }
+    });
+
+    // ESC fecha modal
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeDialog();
+    });
+    </script>
+</body>
+</html>

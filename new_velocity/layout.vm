@@ -1,0 +1,360 @@
+##
+## LAYOUT.VM - Estrutura principal da página
+## Envolve todo o conteúdo
+##
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  #parse("head.vm")
+</head>
+
+<body>
+  ## =============================================================================
+  ## LOADING INICIAL (removido após carregamento)
+  ## =============================================================================
+  <div class="loading-initial" id="loadingInitial">
+    <div class="spinner"></div>
+  </div>
+
+  ## =============================================================================
+  ## SKIP LINK (acessibilidade)
+  ## =============================================================================
+  <a href="#main-content" class="skip-link">Pular para conteúdo principal</a>
+
+  ## =============================================================================
+  ## HEADER
+  ## =============================================================================
+  <header role="banner">
+    <div class="header-content">
+      ## Logo
+      <div class="logo-container">
+        <a href="#{url_for_home}" title="Página Inicial">
+          <img src="/img/eProcessoBuscador.svg" 
+               alt="eProcesso Buscador" 
+               width="200" 
+               height="40">
+        </a>
+      </div>
+
+      ## Busca Principal (inline, não precisa de parse separado para performance)
+      <div class="search-bar">
+        <form id="query-form" 
+              action="#{url_for_home}" 
+              method="GET" 
+              role="search"
+              aria-label="Formulário de busca principal">
+          
+          <div class="search-input-container">
+            <input type="search" 
+                   class="search-input" 
+                   id="q" 
+                   name="q" 
+                   value="$!esc.html($params.get('q'))"
+                   placeholder="Digite sua busca..." 
+                   aria-label="Campo de busca"
+                   autocomplete="off"
+                   required>
+            
+            <button type="button" 
+                    class="clear-input-btn" 
+                    onclick="document.getElementById('q').value=''; document.getElementById('q').focus();"
+                    title="Limpar busca"
+                    aria-label="Limpar campo de busca"
+                    style="display: #if($params.get('q'))inline-flex#{else}none#end;">
+              ×
+            </button>
+          </div>
+          
+          <button type="submit" class="btn btn-primary" aria-label="Executar busca">
+            Buscar
+          </button>
+          
+          <button type="button" 
+                  class="btn btn-secondary btn-filter" 
+                  onclick="openFiltersModal()"
+                  aria-label="Abrir filtros avançados">
+            <img src="/img/filter-solid-full.svg" alt="" class="filter-icon" aria-hidden="true">
+            <span class="filter-text">Filtros Avançados</span>
+          </button>
+
+          ## Manter parâmetros de URL
+          #foreach($fq in $request.params.getParams('fq'))
+            <input type="hidden" name="fq" value="$esc.html($fq)">
+          #end
+          
+          #if($request.params.get('sort'))
+            <input type="hidden" name="sort" value="$esc.html($request.params.get('sort'))">
+          #end
+          
+          #if($request.params.get('debugQuery'))
+            <input type="hidden" name="debugQuery" value="true">
+          #end
+        </form>
+      </div>
+
+      ## Logos Institucionais
+      <div class="institutions" aria-label="Instituições">
+        <img src="/img/Receita.svg" alt="Receita Federal" height="22">
+        <img src="/img/PGFN.svg" alt="PGFN" height="22">
+        <img src="/img/CARF.svg" alt="CARF" height="22">
+      </div>
+    </div>
+  </header>
+
+  ## =============================================================================
+  ## MAIN CONTENT (preenchido por browse.vm via $content)
+  ## =============================================================================
+  <main id="main-content" role="main" class="main-content">
+    $content
+  </main>
+
+  ## =============================================================================
+  ## FOOTER GLOBAL (informações gerais, não confundir com footer de paginação)
+  ## =============================================================================
+  <footer role="contentinfo" class="global-footer" style="display:none;">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h4>Sobre</h4>
+        <p>Sistema de busca avançada para processos administrativos tributários</p>
+      </div>
+      
+      <div class="footer-section">
+        <h4>Ajuda</h4>
+        <ul>
+          <li><a href="/help.html" target="_blank">Guia de Uso</a></li>
+          <li><a href="#" onclick="openFiltersModal(); return false;">Filtros Avançados</a></li>
+          <li><a href="#{url_for_home}?q=*:*&debugQuery=true">Modo Debug</a></li>
+        </ul>
+      </div>
+      
+      <div class="footer-section">
+        <h4>Contato</h4>
+        <p>Suporte técnico:<br>
+        <a href="mailto:suporte@receita.fazenda.gov.br">suporte@receita.fazenda.gov.br</a></p>
+      </div>
+    </div>
+    
+    <div class="footer-bottom">
+      <p>&copy; #set($year = $date.getYear() + 1900)${year} Receita Federal do Brasil. Todos os direitos reservados.</p>
+    </div>
+  </footer>
+
+  ## =============================================================================
+  ## SCRIPTS FINAIS (antes do </body> para performance)
+  ## =============================================================================
+  <script>
+    ## Remover loading inicial
+    document.addEventListener('DOMContentLoaded', function() {
+      const loading = document.getElementById('loadingInitial');
+      if (loading) {
+        loading.style.opacity = '0';
+        setTimeout(function() {
+          loading.remove();
+        }, 300);
+      }
+      
+      ## Fade in do main
+      const main = document.querySelector('main');
+      if (main) {
+        main.classList.add('loaded');
+      }
+      
+      ## Auto-focus no campo de busca (se vazio)
+      const searchInput = document.getElementById('q');
+      if (searchInput && !searchInput.value) {
+        searchInput.focus();
+      }
+    });
+
+    ## Mostrar/esconder botão de limpar busca
+    document.addEventListener('DOMContentLoaded', function() {
+      const searchInput = document.getElementById('q');
+      const clearBtn = document.querySelector('.clear-input-btn');
+      
+      if (searchInput && clearBtn) {
+        searchInput.addEventListener('input', function() {
+          clearBtn.style.display = this.value ? 'inline-flex' : 'none';
+        });
+      }
+    });
+
+    ## Atalhos de teclado
+    document.addEventListener('keydown', function(e) {
+      ## Ctrl/Cmd + K = focus no search
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        document.getElementById('q').focus();
+      }
+      
+      ## Ctrl/Cmd + F = abrir filtros
+      if ((e.ctrlKey || e.metaKey) && e.key === 'f' && !e.shiftKey) {
+        e.preventDefault();
+        openFiltersModal();
+      }
+      
+      ## ESC = fechar modal
+      if (e.key === 'Escape') {
+        closeFiltersModal();
+      }
+    });
+
+    ## Validação do form
+    document.getElementById('query-form').addEventListener('submit', function(e) {
+      const q = document.getElementById('q').value.trim();
+      
+      ## Se vazio, usar *:*
+      if (!q) {
+        document.getElementById('q').value = '*:*';
+      }
+      
+      ## Avisar se query muito complexa (mais de 500 chars)
+      if (q.length > 500) {
+        if (!confirm('Sua consulta é muito longa e pode demorar. Deseja continuar?')) {
+          e.preventDefault();
+        }
+      }
+    });
+
+    ## Feedback de ações
+    window.showToast = function(message, type) {
+      type = type || 'success';
+      const toast = document.createElement('div');
+      toast.className = 'toast toast-' + type;
+      toast.textContent = message;
+      
+      toast.style.cssText = 'position:fixed;top:20px;right:20px;padding:12px 20px;' +
+                           'background:#28a745;color:white;border-radius:4px;' +
+                           'box-shadow:0 4px 12px rgba(0,0,0,0.15);z-index:10000;' +
+                           'animation:slideInRight 0.3s ease-out;';
+      
+      if (type === 'error') toast.style.background = '#dc3545';
+      if (type === 'warning') toast.style.background = '#ffc107';
+      if (type === 'info') toast.style.background = '#17a2b8';
+      
+      document.body.appendChild(toast);
+      
+      setTimeout(function() {
+        toast.style.animation = 'slideOutRight 0.3s ease-out';
+        setTimeout(function() {
+          toast.remove();
+        }, 300);
+      }, 3000);
+    };
+
+    ## Marcar links externos
+    document.querySelectorAll('a[href^="http"]').forEach(function(link) {
+      if (!link.hostname.includes(window.location.hostname)) {
+        link.setAttribute('target', '_blank');
+        link.setAttribute('rel', 'noopener noreferrer');
+      }
+    });
+
+    ## Performance: Lazy load de imagens
+    if ('IntersectionObserver' in window) {
+      const imageObserver = new IntersectionObserver(function(entries, observer) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            const img = entry.target;
+            img.src = img.dataset.src;
+            img.classList.remove('lazy');
+            observer.unobserve(img);
+          }
+        });
+      });
+      
+      document.querySelectorAll('img.lazy').forEach(function(img) {
+        imageObserver.observe(img);
+      });
+    }
+
+    ## Log de erros para debug
+    #if($request.params.get('debugQuery'))
+    window.addEventListener('error', function(e) {
+      console.error('❌ Erro JavaScript:', {
+        message: e.message,
+        filename: e.filename,
+        lineno: e.lineno,
+        colno: e.colno
+      });
+    });
+    #end
+  </script>
+
+  ## CSS para animações
+  <style>
+    @keyframes slideInRight {
+      from { transform: translateX(400px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    
+    @keyframes slideOutRight {
+      from { transform: translateX(0); opacity: 1; }
+      to { transform: translateX(400px); opacity: 0; }
+    }
+    
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      background: #1351B4;
+      color: white;
+      padding: 8px;
+      text-decoration: none;
+      z-index: 100;
+    }
+    
+    .skip-link:focus {
+      top: 0;
+    }
+    
+    .global-footer {
+      background: #f8f9fa;
+      border-top: 2px solid #1351B4;
+      padding: 40px 20px 20px;
+      margin-top: auto;
+    }
+    
+    .footer-content {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 30px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .footer-section h4 {
+      color: #1351B4;
+      margin-bottom: 10px;
+    }
+    
+    .footer-section ul {
+      list-style: none;
+      padding: 0;
+    }
+    
+    .footer-section li {
+      margin: 5px 0;
+    }
+    
+    .footer-section a {
+      color: #333;
+      text-decoration: none;
+    }
+    
+    .footer-section a:hover {
+      color: #1351B4;
+      text-decoration: underline;
+    }
+    
+    .footer-bottom {
+      text-align: center;
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #ddd;
+      color: #666;
+      font-size: 0.9em;
+    }
+  </style>
+</body>
+</html>
